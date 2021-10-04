@@ -42,6 +42,7 @@ impl PerceptronWeights{
         self.weight4 = self.weight4 + offset * input4;
         self.weight5 = self.weight5 + offset * input5;
         self.bias = self.bias + offset;
+        // Call previous perceptron here
     }
     fn sigmoid(&self, input_sum: f32) -> f64{
         1f64/(E.powf(input_sum as f64))
