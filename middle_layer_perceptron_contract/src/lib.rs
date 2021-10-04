@@ -7,7 +7,7 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use std::f64::consts::{E};
 
 #[near_bindgen]
-#[derive(BorshDeserialize , BorshSerialize)]
+#[derive(BorshDeserialize , BorshSerialize, Default)]
 pub struct PerceptronWeights {
     weight1: f32,
     weight2: f32,
