@@ -4,7 +4,7 @@ Testing of a multi-layer perceptron contract
 
 use near_sdk::{near_bindgen, env};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use std::f64::consts::E;
+use std::f64::consts::{E};
 
 #[near_bindgen]
 #[derive(BorshDeserialize , BorshSerialize)]
@@ -36,14 +36,17 @@ impl PerceptronWeights{
         // Call next Contract here
     }
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32){
-        
-        self.weight1 = self.weight1 + offset * input1;
-        self.weight2 = self.weight2 + offset * input2;
-        self.weight3 = self.weight3 + offset * input3;
-        self.weight4 = self.weight4 + offset * input4;
-        self.weight5 = self.weight5 + offset * input5;
-        self.bias = self.bias + offset;
-        // Call previous perceptron here
+        let pred_id: String = env::predecessor_account_id().to_string();
+        let split_pred_id: Vec<&str> = pred_id.split(".").collect();
+        if split_pred_id[pred_id.len()-2] == String::from("perceptron"){
+            self.weight1 = self.weight1 + offset * input1;
+            self.weight2 = self.weight2 + offset * input2;
+            self.weight3 = self.weight3 + offset * input3;
+            self.weight4 = self.weight4 + offset * input4;
+            self.weight5 = self.weight5 + offset * input5;
+            self.bias = self.bias + offset;
+            // Call previous perceptron here
+        }
     }
     fn sigmoid(&self, input_sum: f32) -> f64{
         1f64/(E.powf(input_sum as f64))
