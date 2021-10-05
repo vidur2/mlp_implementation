@@ -51,6 +51,6 @@ impl MiddleNeuron{
         higher_level_nueron::predict(input1, input2, outputs, input_vector, expected_ouput,higher_level_nueron_account_id, NO_DEPOSIT, gas_count);
     }
     fn sigmoid(&self, input_sum: f32) -> f32{
-        1f32/(E.powf(input_sum as f64) as f32)
+        1f32/(1f32 + E.powf(-input_sum as f64) as f32)
     }
 }

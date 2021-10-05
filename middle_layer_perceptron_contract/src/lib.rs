@@ -92,6 +92,6 @@ impl PerceptronWeights{
 
     // Ouput function
     fn sigmoid(&self, input_sum: f32) -> f32{
-        1f32/(E.powf(input_sum as f64) as f32)
+        1f32/(1f32 + E.powf(-input_sum as f64) as f32)
     }
 }
