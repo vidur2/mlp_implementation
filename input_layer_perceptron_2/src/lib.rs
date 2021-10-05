@@ -32,12 +32,12 @@ pub struct InputNueron2{
 }
 
 #[ext_contract(higher_level_nueron)]
-pub trait HigherLevelNueron{
+pub trait MiddleNeuron{
     fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32);
 }
 
 #[ext_contract(lower_level_nueron)]
-pub trait LowerLevelNueron{
+pub trait InputNueron{
     fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32);
 }
 

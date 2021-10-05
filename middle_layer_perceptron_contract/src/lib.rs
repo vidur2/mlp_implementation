@@ -26,7 +26,7 @@ pub trait HigherLevelNueron{
 
 // Defining the previous nueron's scope and methods in terms of this nueron
 #[ext_contract(lower_level_nueron)]
-pub trait LowerLevelNueron{
+pub trait MiddleNeuron{
     // The only method we need from the previous nueron is the adjust method to change 
     fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input_vector: Vec<Vec<f32>>);
 }

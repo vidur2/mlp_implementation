@@ -14,7 +14,7 @@ const NO_DEPOSIT: Balance = 0;
 const BASE_GAS: u64 = 0;
 
 
-// Input Nueron Weight Struct
+// Input Neuron Weight Struct
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, Default)]
 pub struct InputNueron {
@@ -28,7 +28,7 @@ pub struct InputNueron {
 
 // Defining next nueron's scope in terms of this nueron
 #[ext_contract(higher_level_nueron)]
-pub trait HigherLevelNueron{
+pub trait InputNueron2{
     // Only need the next nueron's predict method, not the adjust method
     fn predict(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, mut outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_ouput: f32);
 }
