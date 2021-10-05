@@ -1,5 +1,6 @@
 /*
 Testing of a multi-layer perceptron contract
+1st nueron in the network
 */
 
 use near_sdk::{near_bindgen, env, ext_contract, Gas, Balance, AccountId};
@@ -29,12 +30,24 @@ pub struct InputNueron {
 #[ext_contract(higher_level_nueron)]
 pub trait HigherLevelNueron{
     // Only need the next nueron's predict method, not the adjust method
-    fn predict(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_ouput: f32);
+    fn predict(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, mut outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_ouput: f32);
 }
 
 // Nueron functions
 #[near_bindgen]
 impl InputNueron{
+    // Runs on Deploy
+    #[init]
+    pub fn new() -> Self {
+        Self {
+            weight1: 8f32,
+            weight2: -9f32,
+            weight3: -8f32,
+            weight4: 10f32,
+            weight5: 1f32,
+            bias: 0f32,
+        }
+    }
     // ViewMethod Predict burns no gas
     pub fn predict(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, expected_ouput: f32){
         let weighted_sum: f32 = self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3 + self.weight4 * input4 + self.weight5 * input5;

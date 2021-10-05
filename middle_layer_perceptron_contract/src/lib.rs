@@ -21,7 +21,7 @@ const BASE_GAS: u64 = 0;
 #[ext_contract(higher_level_nueron)]
 pub trait HigherLevelNueron{
     // The only method we need from the next nueron is the predict method
-    fn predict(&self, input1: f32, input2: f32, outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_ouput: f32);
+    fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32);
 }
 
 // Defining the previous nueron's scope and methods in terms of this nueron
