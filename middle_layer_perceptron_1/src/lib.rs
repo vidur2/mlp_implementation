@@ -52,7 +52,7 @@ impl MiddleNeuron{
         outputs.push(self.sigmoid(weighted_sum));
         let higher_level_nueron_account_id: AccountId = HIGHER_LEVEL_NUERON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS);
-        higher_level_nueron::predict(input1, input2, outputs, input_vector, expected_ouput,higher_level_nueron_account_id, NO_DEPOSIT, gas_count);
+        higher_level_nueron::predict(input1, input2, outputs, input_vector, expected_ouput, higher_level_nueron_account_id, NO_DEPOSIT, gas_count);
     }
     fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input_vector: Vec<Vec<f32>>){
         self.weight1 = self.weight1 + offset * input1;
