@@ -73,22 +73,15 @@ impl PerceptronWeights{
 
     // ChangeMethod adjust for training the nueral net
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input_vector: Vec<Vec<f32>>){
-        // Parses the id of the caller of the contract
-        let pred_id: String = env::predecessor_account_id().to_string();
-        let split_pred_id: Vec<&str> = pred_id.split(".").collect();
+        // Changes the weights
+        self.weight1 = self.weight1 + offset * input1;
+        self.weight2 = self.weight2 + offset * input2;
+        self.bias = self.bias + offset;
 
-        // If the id is the account I own, then run the code
-        if split_pred_id[split_pred_id.len()-2] == String::from("perceptron"){
-            // Changes the weights
-            self.weight1 = self.weight1 + offset * input1;
-            self.weight2 = self.weight2 + offset * input2;
-            self.bias = self.bias + offset;
-
-            // Same deal as with the predict method, just with the neuron before it in the nueral net
-            let lower_level_neuron_id: AccountId = LOWER_LEVEL_NEURON_ID.trim().parse().expect("Invalid user id");
-            let gas_count = Gas::from(BASE_GAS);
-            lower_level_neuron::adjust(offset, input1, input2, input_vector, lower_level_neuron_id, NO_DEPOSIT, gas_count);
-        }
+        // Same deal as with the predict method, just with the neuron before it in the nueral net
+        let lower_level_neuron_id: AccountId = LOWER_LEVEL_NEURON_ID.trim().parse().expect("Invalid user id");
+        let gas_count = Gas::from(BASE_GAS);
+        lower_level_neuron::adjust(offset, input1, input2, input_vector, lower_level_neuron_id, NO_DEPOSIT, gas_count);
     }
 
     // Ouput function

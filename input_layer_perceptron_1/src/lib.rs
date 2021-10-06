@@ -65,19 +65,13 @@ impl InputNeuron{
 
     // adjust fucntion which will be called by a higher level neuron for training
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32) -> f32{
-        // Checks if contract adjustment happens from within the nueral net
-        // Casting of predessescor id to Vector of strings
-        let pred_id: String = env::predecessor_account_id().to_string();
-        let split_pred_id: Vec<&str> = pred_id.split(".").collect();
-        if split_pred_id[split_pred_id.len() - 2] == String::from("perceptron"){
-            // Adjustment of neuron weights according to offset and input
-            self.weight1 = self.weight1 + offset * input1;
-            self.weight2 = self.weight2 + offset * input2;
-            self.weight3 = self.weight3 + offset * input3;
-            self.weight4 = self.weight4 + offset * input4;
-            self.weight5 = self.weight5 + offset * input5;
-            self.bias = self.bias + offset;
-        }
+        // Adjustment of neuron weights according to offset and input
+        self.weight1 = self.weight1 + offset * input1;
+        self.weight2 = self.weight2 + offset * input2;
+        self.weight3 = self.weight3 + offset * input3;
+        self.weight4 = self.weight4 + offset * input4;
+        self.weight5 = self.weight5 + offset * input5;
+        self.bias = self.bias + offset;
         // Returns a value to show the train data that is was successful
         offset
     }

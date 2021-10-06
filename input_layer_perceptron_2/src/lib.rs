@@ -63,20 +63,16 @@ impl InputNeuron2{
         higher_level_neuron::predict(input_vector[1][0], input_vector[1][1], input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32){
-        let pred_id: String = env::predecessor_account_id().to_string();
-        let split_pred_id: Vec<&str> = pred_id.split(".").collect();
-        if split_pred_id[split_pred_id.len() - 2] == String::from("perceptron"){
-            // Adjustment of neuron weights according to offset and input
-            self.weight1 = self.weight1 + offset * input1;
-            self.weight2 = self.weight2 + offset * input2;
-            self.weight3 = self.weight3 + offset * input3;
-            self.weight4 = self.weight4 + offset * input4;
-            self.weight5 = self.weight5 + offset * input5;
-            self.bias = self.bias + offset;
-            let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-            let gas_count = Gas::from(BASE_GAS);
-            lower_level_neuron::adjust(offset, input1, input2, input3, input4, input5, lower_level_neuron_account_id, NO_DEPOSIT, gas_count);
-        }
+        // Adjustment of neuron weights according to offset and input
+        self.weight1 = self.weight1 + offset * input1;
+        self.weight2 = self.weight2 + offset * input2;
+        self.weight3 = self.weight3 + offset * input3;
+        self.weight4 = self.weight4 + offset * input4;
+        self.weight5 = self.weight5 + offset * input5;
+        self.bias = self.bias + offset;
+        let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
+        let gas_count = Gas::from(BASE_GAS);
+        lower_level_neuron::adjust(offset, input1, input2, input3, input4, input5, lower_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
     fn sigmoid(&self, input_sum: f32) -> f32{
         1f32/(1f32 + E.powf(-input_sum as f64) as f32)
