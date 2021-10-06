@@ -43,7 +43,7 @@ impl MiddleNeuron{
         }
     }
     pub fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32){
-        let weighted_sum = self.weight1 * input1 + self.weight2 + input2;
+        let weighted_sum = self.bias  + self.weight1 * input1 + self.weight2 + input2;
         let mut outputs = Vec::new();
         outputs.push(self.sigmoid(weighted_sum));
         let higher_level_nueron_account_id: AccountId = HIGHER_LEVEL_NUERON_ID.to_string().trim().parse().expect("invalid");

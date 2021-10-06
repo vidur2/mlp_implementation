@@ -57,7 +57,7 @@ impl PerceptronWeights{
     // ViewMethod predict, takes in the inputs as the previous layer's outputs, and collects outputs in a vector
     pub fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_ouput: f32){
         // Calculates weighted sum with matrix multiplication of the input vector and the weight vector
-        let weighted_sum: f32 = input1 * self.weight1 + input2 * self.weight2;
+        let weighted_sum: f32 = self.bias + input1 * self.weight1 + input2 * self.weight2;
 
         // Adds weighted_sum to the output vector
         outputs.push(self.sigmoid(weighted_sum));

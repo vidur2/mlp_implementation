@@ -50,7 +50,7 @@ impl InputNueron{
     }
     // ViewMethod Predict burns no gas
     pub fn predict(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, expected_ouput: f32){
-        let weighted_sum: f32 = self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3 + self.weight4 * input4 + self.weight5 * input5;
+        let weighted_sum: f32 = self.bias + self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3 + self.weight4 * input4 + self.weight5 * input5;
         let mut outputs = Vec::new();
         let mut inputs: Vec<Vec<f32>> = Vec::new();
         inputs.push(vec![input1, input2, input3, input4, input5]);
