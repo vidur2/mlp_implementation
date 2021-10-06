@@ -1,5 +1,6 @@
 /*
 Testing of a multi-layer perceptron contract
+Middle neuron 2
 */
 
 use near_sdk::{near_bindgen, env, ext_contract, Gas, Balance, AccountId};
@@ -7,27 +8,27 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use std::f64::consts::{E};
 
 // Constants region for calling new Contracts
-// Higher Level Nueron Contract id
-const HIGHER_LEVEL_NUERON_ID: &str = "mlp5.perceptron.testnet";
+// Higher Level neuron Contract id
+const HIGHER_LEVEL_NEURON_ID: &str = "mlp5.perceptron.testnet";
 
-// Lower Level Nueron Id
-const LOWER_LEVEL_NUERON_ID: &str = "mlp3.perceptron.testnet";
+// Lower Level neuron Id
+const LOWER_LEVEL_NEURON_ID: &str = "mlp3.perceptron.testnet";
 
 // General Constants
 const NO_DEPOSIT: Balance = 0;
 const BASE_GAS: u64 = 0;
 
-// Defining the next nueron's scope and methods in terms of this nueron
-#[ext_contract(higher_level_nueron)]
-pub trait HigherLevelNueron{
-    // The only method we need from the next nueron is the predict method
+// Defining the next neuron's scope and methods in terms of this neuron
+#[ext_contract(higher_level_neuron)]
+pub trait MiddleNeuron3{
+    // The only method we need from the next neuron is the predict method
     fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32);
 }
 
-// Defining the previous nueron's scope and methods in terms of this nueron
-#[ext_contract(lower_level_nueron)]
+// Defining the previous neuron's scope and methods in terms of this neuron
+#[ext_contract(lower_level_neuron)]
 pub trait MiddleNeuron{
-    // The only method we need from the previous nueron is the adjust method to change 
+    // The only method we need from the previous neuron is the adjust method to change 
     fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input_vector: Vec<Vec<f32>>);
 }
 
@@ -63,11 +64,11 @@ impl PerceptronWeights{
         outputs.push(self.sigmoid(weighted_sum));
 
         // Casts environment constants to required type before passing them as the default parameters in a cross-contract call
-        let higher_level_nueron_account_id: AccountId = HIGHER_LEVEL_NUERON_ID.to_string().trim().parse().expect("invalid");
+        let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS);
 
         // Cross-Contract call
-        higher_level_nueron::predict(input1, input2, outputs, input_vector, expected_ouput, higher_level_nueron_account_id, NO_DEPOSIT, gas_count);
+        higher_level_neuron::predict(input1, input2, outputs, input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
 
     // ChangeMethod adjust for training the nueral net
@@ -83,10 +84,10 @@ impl PerceptronWeights{
             self.weight2 = self.weight2 + offset * input2;
             self.bias = self.bias + offset;
 
-            // Same deal as with the predict method, just with the nueron before it in the nueral net
-            let lower_level_nueron_id: AccountId = LOWER_LEVEL_NUERON_ID.trim().parse().expect("Invalid user id");
+            // Same deal as with the predict method, just with the neuron before it in the nueral net
+            let lower_level_neuron_id: AccountId = LOWER_LEVEL_NEURON_ID.trim().parse().expect("Invalid user id");
             let gas_count = Gas::from(BASE_GAS);
-            lower_level_nueron::adjust(offset, input1, input2, input_vector, lower_level_nueron_id, NO_DEPOSIT, gas_count);
+            lower_level_neuron::adjust(offset, input1, input2, input_vector, lower_level_neuron_id, NO_DEPOSIT, gas_count);
         }
     }
 
