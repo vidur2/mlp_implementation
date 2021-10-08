@@ -1,6 +1,6 @@
 /*
 Testing of a multi-layer perceptron contract
-Middle neuron 3s
+Middle neuron 3
 */
 
 use near_sdk::{near_bindgen, env, ext_contract, Gas, Balance, AccountId};
