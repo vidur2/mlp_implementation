@@ -32,7 +32,7 @@ pub trait PerceptronWeights{
 
 #[ext_contract(higher_level_neuron)]
 pub trait OutputNeuron{
-    fn predict(&self, input1: f32, input2: f32, input3: f32, mut input_vector: Vec<Vec<f32>>, expected_output: f32);
+    fn predict(&mut self, input1: f32, input2: f32, input3: f32, mut input_vector: Vec<Vec<f32>>, expected_output: f32);
 }
 
 #[near_bindgen]
