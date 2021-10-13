@@ -16,7 +16,7 @@ const LOWER_LEVEL_NEURON_ID: &str = "mlp4.perceptron.testnet";
 
 // General Constants
 const NO_DEPOSIT: Balance = 0;
-const BASE_GAS: u64 = 0;
+const BASE_GAS: u64 = 100000000;
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, Default)]

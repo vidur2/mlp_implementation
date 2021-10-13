@@ -11,7 +11,7 @@ use std::f64::consts::{E};
 // General Constants
 const HIGHER_LEVEL_NEURON_ID: &str = "mlp2.perceptron.testnet";
 const NO_DEPOSIT: Balance = 0;
-const BASE_GAS: u64 = 0;
+const BASE_GAS: u64 = 100000000;
 
 
 // Input Neuron Weight Struct
@@ -63,7 +63,7 @@ impl InputNeuron{
         higher_level_neuron::predict(input1, input2, input3, input4, input5, outputs, inputs, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
 
-    // adjust fucntion which will be called by a higher level neuron for training
+    // adjust function which will be called by a higher level neuron for training
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32) -> f32{
         // Adjustment of neuron weights according to offset and input
         self.weight1 = self.weight1 + offset * input1;
