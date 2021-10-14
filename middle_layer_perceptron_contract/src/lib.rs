@@ -16,7 +16,7 @@ const LOWER_LEVEL_NEURON_ID: &str = "mlp3.perceptron.testnet";
 
 // General Constants
 const NO_DEPOSIT: Balance = 0;
-const BASE_GAS: u64 = 100000000;
+const BASE_GAS: u64 = 5_000_000_000_000;
 
 // Defining the next neuron's scope and methods in terms of this neuron
 #[ext_contract(higher_level_neuron)]

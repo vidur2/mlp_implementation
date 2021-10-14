@@ -12,7 +12,7 @@ const LOWER_LEVEL_NEURON_ID: &str = "mlp5.perceptron.testnet";
 
 // General Constants
 const NO_DEPOSIT: Balance = 0;
-const BASE_GAS: u64 = 100000000;
+const BASE_GAS: u64 = 5_000_000_000_000;
 
 
 #[near_bindgen]

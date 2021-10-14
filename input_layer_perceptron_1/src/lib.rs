@@ -11,7 +11,7 @@ use std::f64::consts::{E};
 // General Constants
 const HIGHER_LEVEL_NEURON_ID: &str = "mlp2.perceptron.testnet";
 const NO_DEPOSIT: Balance = 0;
-const BASE_GAS: u64 = 100000000;
+const BASE_GAS: u64 = 5_000_000_000_000;
 
 
 // Input Neuron Weight Struct
