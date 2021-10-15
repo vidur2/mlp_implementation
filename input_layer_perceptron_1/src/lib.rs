@@ -56,7 +56,7 @@ impl InputNeuron{
         
         // Casts environment variables to nessescary type in order to make a cross-contract call
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = Gas::from(BASE_GAS * 12u64);
+        let gas_count = Gas::from(BASE_GAS * 21u64);
         // Cross contract call to send infor to other neuron
         higher_level_neuron::predict(input1, input2, input3, input4, input5, outputs, inputs, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
@@ -76,7 +76,7 @@ impl InputNeuron{
 
     // Activation function
     fn sigmoid(&self, input_sum: f32) -> f32{
-        let e = 2.71828f64
+        let e = 2.71828f64;
         1f32/(1f32 + e.powf(-input_sum as f64) as f32)
     }
 }

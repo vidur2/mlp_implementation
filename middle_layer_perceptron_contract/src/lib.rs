@@ -65,7 +65,7 @@ impl PerceptronWeights{
 
         // Casts environment constants to required type before passing them as the default parameters in a cross-contract call
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = Gas::from(BASE_GAS);
+        let gas_count = Gas::from(BASE_GAS * 18u64 - BASE_GAS * 5*3/4);
 
         // Cross-Contract call
         higher_level_neuron::predict(input1, input2, outputs, input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
@@ -80,7 +80,7 @@ impl PerceptronWeights{
 
         // Same deal as with the predict method, just with the neuron before it in the nueral net
         let lower_level_neuron_id: AccountId = LOWER_LEVEL_NEURON_ID.trim().parse().expect("Invalid user id");
-        let gas_count = Gas::from(BASE_GAS);
+        let gas_count = Gas::from(BASE_GAS * 14u64 - BASE_GAS * 5*7/4);
         lower_level_neuron::adjust(offset, input1, input2, input_vector, lower_level_neuron_id, NO_DEPOSIT, gas_count);
     }
 

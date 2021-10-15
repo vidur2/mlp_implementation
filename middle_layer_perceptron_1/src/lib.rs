@@ -9,10 +9,10 @@ use std::f64::consts::{E};
 
 // Constants region for calling new Contracts
 // Higher Level neuron Contract id
-const HIGHER_LEVEL_NEURON_ID: &str = "mlp2.perceptron.testnet";
+const HIGHER_LEVEL_NEURON_ID: &str = "mlp4.perceptron.testnet";
 
 // Lower Level neuron Id
-const LOWER_LEVEL_NEURON_ID: &str = "mlp4.perceptron.testnet";
+const LOWER_LEVEL_NEURON_ID: &str = "mlp2.perceptron.testnet";
 
 // General Constants
 const NO_DEPOSIT: Balance = 0;
@@ -51,7 +51,7 @@ impl MiddleNeuron{
         let mut outputs = Vec::new();
         outputs.push(self.sigmoid(weighted_sum));
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = Gas::from(BASE_GAS);
+        let gas_count = Gas::from(BASE_GAS * 19u64 - BASE_GAS * 5*2/4);
         higher_level_neuron::predict(input1, input2, outputs, input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input_vector: Vec<Vec<f32>>){
@@ -59,7 +59,7 @@ impl MiddleNeuron{
         self.weight2 = self.weight2 + offset * input2;
         self.bias = self.bias + offset;
         let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = Gas::from(BASE_GAS);
+        let gas_count = Gas::from(BASE_GAS * 13u64 - BASE_GAS * 5*8/4);
         lower_level_neuron::adjust(offset, input_vector[0][0], input_vector[0][1], input_vector[0][2], input_vector[0][3], input_vector[0][4], lower_level_neuron_account_id, NO_DEPOSIT, gas_count);
 
     }

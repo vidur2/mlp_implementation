@@ -51,7 +51,7 @@ impl MiddleNeuron3{
         input_vector.push(outputs);
         // Casts environment constants to required type before passing them as the default parameters in a cross-contract call
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = Gas::from(2 * BASE_GAS);
+        let gas_count = Gas::from(BASE_GAS * 17u64 - BASE_GAS * 5*4/4);
         higher_level_neuron::predict(input_vector[2][0], input_vector[2][1], input_vector[2][2], input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
     pub fn adjust(&mut self, offset: f32, mut input_vector: Vec<Vec<f32>>){
@@ -61,7 +61,7 @@ impl MiddleNeuron3{
         self.weight2 = self.weight2 + offset * input2;
         self.bias = self.bias + offset;
         let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = Gas::from(BASE_GAS);
+        let gas_count = Gas::from(BASE_GAS * 15u64 - BASE_GAS * 5*6/4);
         lower_level_neuron::adjust(offset, input1, input2, input_vector, lower_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
     fn sigmoid(&self, input_sum: f32) -> f32{
