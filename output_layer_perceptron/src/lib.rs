@@ -45,7 +45,7 @@ impl OutputNeuron {
         let offset = expected_output - self.step_function(weighted_sum);
         let returned_values = self.train(offset, input_vector);
         let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = Gas::from(BASE_GAS);
+        let gas_count = Gas::from(BASE_GAS * 16u64 - BASE_GAS * 5*5/4);
         lower_level_neuron::adjust(returned_values.1, returned_values.0, lower_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
     fn train(&mut self, offset: f32, input_vector: Vec<Vec<f32>>) -> (Vec<Vec<f32>>, f32){
