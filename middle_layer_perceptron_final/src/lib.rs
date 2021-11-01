@@ -33,6 +33,7 @@ pub trait PerceptronWeights{
 #[ext_contract(higher_level_neuron)]
 pub trait OutputNeuron{
     fn predict(&mut self, input1: f32, input2: f32, input3: f32, mut input_vector: Vec<Vec<f32>>, expected_output: f32);
+    fn predict_raw(&self, input1: f32, input2: f32, input3: f32);
 }
 
 #[near_bindgen]
@@ -66,5 +67,13 @@ impl MiddleNeuron3{
     }
     fn sigmoid(&self, input_sum: f32) -> f32{
         1f32/(1f32 + E.powf(-input_sum as f64) as f32)
+    }
+    pub fn predict_raw(&self, input1: f32, input2: f32, mut outputs: Vec<f32>) -> near_sdk::Promise{
+        let weighted_sum = self.bias + input1 * self.weight1 + input2 * self.weight2;
+        outputs.push(self.sigmoid(weighted_sum));
+        // Casts environment constants to required type before passing them as the default parameters in a cross-contract call
+        let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
+        let gas_count = Gas::from(BASE_GAS * 17u64 - BASE_GAS * 5*4/4);
+        higher_level_neuron::predict_raw(outputs[0], outputs[1], outputs[2], higher_level_neuron_account_id, NO_DEPOSIT, gas_count)
     }
 }

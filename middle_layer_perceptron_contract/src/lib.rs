@@ -23,6 +23,7 @@ const BASE_GAS: u64 = 5_000_000_000_000;
 pub trait MiddleNeuron3{
     // The only method we need from the next neuron is the predict method
     fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32);
+    fn predict_raw(&self, input1: f32, input2: f32, mut outputs: Vec<f32>);
 }
 
 // Defining the previous neuron's scope and methods in terms of this neuron
@@ -82,6 +83,14 @@ impl PerceptronWeights{
         let lower_level_neuron_id: AccountId = LOWER_LEVEL_NEURON_ID.trim().parse().expect("Invalid user id");
         let gas_count = Gas::from(BASE_GAS * 14u64 - BASE_GAS * 5*7/4);
         lower_level_neuron::adjust(offset, input1, input2, input_vector, lower_level_neuron_id, NO_DEPOSIT, gas_count);
+    }
+
+    pub fn predict_raw(&self, input1: f32, input2: f32, mut outputs: Vec<f32>) -> near_sdk::Promise{
+        let weighted_sum = self.bias  + self.weight1 * input1 + self.weight2 + input2;
+        outputs.push(weighted_sum);
+        let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
+        let gas_count = Gas::from(BASE_GAS * 18u64 - BASE_GAS * 5*3/4);
+        higher_level_neuron::predict_raw(input1, input2, outputs, higher_level_neuron_account_id, NO_DEPOSIT, gas_count)
     }
 
     // Ouput function

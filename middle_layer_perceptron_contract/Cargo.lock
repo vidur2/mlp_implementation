@@ -298,7 +298,9 @@ dependencies = [
 
 [[package]]
 name = "near-sdk"
-version = "4.0.0-pre.2"
+version = "4.0.0-pre.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10f570e260eae9169dd5ffe0764728b872c2df79b8786dfb5e57183bd383908e"
 dependencies = [
  "base64",
  "borsh",
@@ -314,7 +316,9 @@ dependencies = [
 
 [[package]]
 name = "near-sdk-macros"
-version = "4.0.0-pre.2"
+version = "4.0.0-pre.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65ddca18086f1ab14ce8541e0c23f503a322d45914f2fe08f571844045d32bde"
 dependencies = [
  "Inflector",
  "proc-macro2",
@@ -325,6 +329,8 @@ dependencies = [
 [[package]]
 name = "near-sys"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6a7aa3f46fac44416d8a93d14f30a562c4d730a1c6bf14bffafab5f475c244a"
 
 [[package]]
 name = "near-vm-errors"
