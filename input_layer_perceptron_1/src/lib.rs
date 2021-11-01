@@ -3,7 +3,7 @@ Testing of a multi-layer perceptron contract
 1st neuron in the network
 */
 
-use near_sdk::{near_bindgen, env, ext_contract, Gas, Balance, AccountId};
+use near_sdk::{near_bindgen, env, ext_contract, Gas, Balance, AccountId, Promise};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 
 // General Constants
@@ -27,8 +27,9 @@ pub struct InputNeuron {
 // Defining next neuron's scope in terms of this neuron
 #[ext_contract(higher_level_neuron)]
 pub trait InputNeuron2{
-    // Only need the next neuron's predict method, not the adjust method
+    // Only need the next neuron's predict methods, not the adjust method
     fn predict(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, mut outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_ouput: f32);
+    fn predict_raw(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, mut outputs: Vec<f32>);
 }
 
 // neuron functions
@@ -60,6 +61,20 @@ impl InputNeuron{
         // Cross contract call to send infor to other neuron
         higher_level_neuron::predict(input1, input2, input3, input4, input5, outputs, inputs, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
+
+    // ViewMethod Predict burns no gas
+    pub fn predict_raw(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32) -> near_sdk::Promise{
+        let weighted_sum: f32 = self.bias + self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3 + self.weight4 * input4 + self.weight5 * input5;
+        let mut outputs = Vec::new();
+        outputs.push(self.sigmoid(weighted_sum));
+        
+        // Casts environment variables to nessescary type in order to make a cross-contract call
+        let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
+        let gas_count = Gas::from(BASE_GAS * 21u64);
+        // Cross contract call to send infor to other neuron
+        higher_level_neuron::predict_raw(input1, input2, input3, input4, input5, outputs, higher_level_neuron_account_id, NO_DEPOSIT, gas_count)
+    }
+
 
     // adjust function which will be called by a higher level neuron for training
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32) -> f32{

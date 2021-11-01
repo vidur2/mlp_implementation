@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-near-sdk = { path = "../../near-sdk-rs/near-sdk" }
+near-sdk = "4.0.0-pre.4"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

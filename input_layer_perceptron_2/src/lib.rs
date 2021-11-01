@@ -3,7 +3,7 @@ Testing of a multi-layer perceptron contract
 2nd neuron in the network
 */
 
-use near_sdk::{near_bindgen, env, ext_contract, Gas, Balance, AccountId};
+use near_sdk::{near_bindgen, env, ext_contract, Gas, Balance, AccountId, Promise};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use std::f32::consts::E;
 
@@ -34,6 +34,7 @@ pub struct InputNeuron2{
 #[ext_contract(higher_level_neuron)]
 pub trait MiddleNeuron{
     fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32);
+    fn predict_raw(&self, input1: f32, input2: f32);
 }
 
 #[ext_contract(lower_level_neuron)]
@@ -62,6 +63,16 @@ impl InputNeuron2{
         let gas_count = Gas::from(BASE_GAS * 20u64 - BASE_GAS * 5/4);
         higher_level_neuron::predict(input_vector[1][0], input_vector[1][1], input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
+
+    pub fn predict_raw(&self, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32, mut outputs: Vec<f32>) -> near_sdk::Promise{
+        let weighted_sum: f32 = self.bias + input1 * self.weight1 + input2 * self.weight2 + input3 * self.weight3 + input4 * self.weight4 + input5 * self.weight5;
+        outputs.push(self.sigmoid(weighted_sum));
+        let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
+        let gas_count = Gas::from(BASE_GAS * 20u64 - BASE_GAS * 5/4);
+        higher_level_neuron::predict_raw(outputs[0], outputs[1], higher_level_neuron_account_id, NO_DEPOSIT, gas_count)
+    }
+
+
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input3: f32, input4: f32, input5: f32){
         // Adjustment of neuron weights according to offset and input
         self.weight1 = self.weight1 + offset * input1;
