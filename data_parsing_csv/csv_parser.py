@@ -72,12 +72,12 @@ def main():
     possible_locations = set(data["Location"])
 
     for location in possible_locations:
-        data[data["Location"] == location].fillna(data[data["Location"] == location].mean(), inplace=True)
+        data[data["Location"] == location] = data[data["Location"] == location].fillna(data[data["Location"] == location].mean())
+
 
     data.fillna(data.mean(), inplace=True)
     data.drop("Location", axis=1, inplace=True)
-    print(data.info())
-    data.to_html("./weather_output.html")
+    data.to_csv("./weather_output.csv")
 
     
 
