@@ -77,6 +77,7 @@ def main():
 
     data.fillna(data.mean(), inplace=True)
     data.drop("Location", axis=1, inplace=True)
+    print(data.info())
     data.to_csv("./weather_output.csv")
 
     
