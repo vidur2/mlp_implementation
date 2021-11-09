@@ -110,7 +110,7 @@ export default function Train(){
                         input21: input21,
                         input22: input22,
                         input23: input23,
-                        input24: input24,
+                        expected_output: input24,
                     },
                     115_000_000_000_000
                 )
