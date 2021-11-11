@@ -5,25 +5,25 @@ async function send_function_to_wallet(input){
     const keyPair = KeyPair.fromString(process.env.private_key)
     await keyStore.setKey("testnet", "perceptron.testnet", keyPair) 
     const config = {
-    networkId: "testnet",
-    keyStore,
-    nodeUrl: "https://rpc.testnet.near.org",
-    walletUrl: "https://wallet.testnet.near.org",
-    helperUrl: "https://helper.testnet.near.org",
-    explorerUrl: "https://explorer.testnet.near.org",
-    }
-    const near = await connect(config)
-    const account = await near.account("perceptron.testnet")
-    const contract = new Contract(
-    account,
-    "mlp1.perceptron.testnet",
-    {
-        changeMethods: [
-        "predict",
-        "predict_raw"
-        ],
-        sender: account,
-    }
+        networkId: "testnet",
+        keyStore,
+        nodeUrl: "https://rpc.testnet.near.org",
+        walletUrl: "https://wallet.testnet.near.org",
+        helperUrl: "https://helper.testnet.near.org",
+        explorerUrl: "https://explorer.testnet.near.org",
+        }
+        const near = await connect(config)
+        const account = await near.account("perceptron.testnet")
+        const contract = new Contract(
+        account,
+        "mlp1.perceptron.testnet",
+        {
+            changeMethods: [
+            "predict",
+            "predict_raw"
+            ],
+            sender: account,
+        }
     )
 
     contract.predict(
@@ -59,8 +59,7 @@ async function send_function_to_wallet(input){
 
 export default function handler(req, res){
     if (req.method == "POST"){
-        const reqBody = JSON.parse(req.body)
-        send_function_to_wallet(reqBody.input)
+        send_function_to_wallet(req.body.split(","))
         res.status(200).json({Success: "Request is being processed"})
     }else{
         res.status(400).json({Failuire: "Invalid Method"})
