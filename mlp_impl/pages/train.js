@@ -35,37 +35,42 @@ export default function Train(){
       file_reader.onload = async function(result) { 
           const string_result = result.target.result.toString();
           const split_result = string_result.split("\n")
-          for (row in split_result){
+          split_result.splice(0, 1);
+          for (let i = 0; i < split_result.length; i++){
+              const row = split_result[i];
               const inputs = row.split(",")
               contract.predict(
                   {
-                    input1: inputs[0],
-                    input2: inputs[1],
-                    input3: inputs[2],
-                    input4: inputs[3],
-                    input5: inputs[4],
-                    input6: inputs[5],
-                    input7: inputs[6],
-                    input8: inputs[7],
-                    input9: inputs[8],
-                    input10: inputs[9],
-                    input11: inputs[10],
-                    input12: inputs[11],
-                    input13: inputs[12],
-                    input14: inputs[13],
-                    input15: inputs[14],
-                    input16: inputs[15],
-                    input17: inputs[16],
-                    input18: inputs[17],
-                    input19: inputs[18],
-                    input20: inputs[19],
-                    input21: inputs[20],
-                    input22: inputs[21],
-                    input23: inputs[22],
-                    expected_output: inputs[24],
+                    input1: parseFloat(inputs[0]),
+                    input2: parseFloat(inputs[1]),
+                    input3: parseFloat(inputs[2]),
+                    input4: parseFloat(inputs[3]),
+                    input5: parseFloat(inputs[4]),
+                    input6: parseFloat(inputs[5]),
+                    input7: parseFloat(inputs[6]),
+                    input8: parseFloat(inputs[7]),
+                    input9: parseFloat(inputs[8]),
+                    input10: parseFloat(inputs[9]),
+                    input11: parseFloat(inputs[10]),
+                    input12: parseFloat(inputs[11]),
+                    input13: parseFloat(inputs[12]),
+                    input14: parseFloat(inputs[13]),
+                    input15: parseFloat(inputs[14]),
+                    input16: parseFloat(inputs[15]),
+                    input17: parseFloat(inputs[16]),
+                    input18: parseFloat(inputs[17]),
+                    input19: parseFloat(inputs[23]),
+                    input20: parseFloat(inputs[19]),
+                    input21: parseFloat(inputs[20]),
+                    input22: parseFloat(inputs[21]),
+                    input23: parseFloat(inputs[22]),
+                    expected_output: parseFloat(inputs[18]),
                   },
                   115_000_000_000_000
-              )
+              ).then((result) => {
+                  console.log("shit")
+                  console.log(result)
+              })
           }
       }
 
