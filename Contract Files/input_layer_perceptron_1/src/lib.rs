@@ -73,7 +73,7 @@ pub trait InputNeuron2{
         input23: f32,
         mut outputs: Vec<f32>, 
         mut input_vector: Vec<Vec<f32>>, 
-        expected_ouput: f32
+        expected_output: f32
     );
 
     fn predict_raw(
@@ -113,7 +113,7 @@ impl InputNeuron{
     pub fn new() -> Self {
         let rand = env::random_seed();
         Self {
-            weight1: if rand[22] > 128u8 { rand[0] as f32 } else { -1f32 * (rand[0] as f32) },
+            weight1: if rand[23] > 128u8 { rand[0] as f32 } else { -1f32 * (rand[0] as f32) },
             weight2: if rand[0] > 128u8 { rand[1] as f32 } else { -1f32 * (rand[1] as f32) },
             weight3: if rand[1] > 128u8 { rand[2] as f32 } else { -1f32 * (rand[2] as f32)},
             weight4: if rand[2] > 128u8 {rand[3] as f32} else {-1f32 * (rand[3] as f32)},
@@ -165,7 +165,7 @@ impl InputNeuron{
         input21: f32,
         input22: f32,
         input23: f32,
-        expected_ouput: f32
+        expected_output: f32
     ){
         let weighted_sum: f32 = self.bias + self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3 + self.weight4 * input4 + self.weight5 * input5 + self.weight6 * input6 + self.weight7 * input7 + self.weight8 * input8 + self.weight9 * input9 + self.weight10 * input10 + self.weight11 * input11 + self.weight12 * input12 + self.weight13 * input13 + self.weight14 * input14 + self.weight15 * input15 + self.weight16 * input16 + self.weight17 * input17  + self.weight18 * input18 + self.weight19 * input19 + self.weight20 * input20 + self.weight21 * input21 + self.weight22 * input22 + self.weight23 * input23;
         let mut outputs = Vec::new();
@@ -203,7 +203,7 @@ impl InputNeuron{
             input23 ,
             outputs, 
             inputs, 
-            expected_ouput, 
+            expected_output, 
             higher_level_neuron_account_id, 
             NO_DEPOSIT, 
             gas_count
@@ -236,7 +236,7 @@ impl InputNeuron{
         input20: f32,
         input21: f32,
         input22: f32,
-        input23: f32
+        input23: f32,
     ) -> near_sdk::Promise{
         let weighted_sum: f32 = self.bias + self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3 + self.weight4 * input4 + self.weight5 * input5 + self.weight6 * input6 + self.weight7 * input7 + self.weight8 * input8 + self.weight9 * input9 + self.weight10 * input10 + self.weight11 * input11 + self.weight12 * input12 + self.weight13 * input13 + self.weight14 * input14 + self.weight15 * input15 + self.weight16 * input16 + self.weight17 * input17  + self.weight18 * input18 + self.weight19 * input19 + self.weight20 * input20 + self.weight21 * input21 + self.weight22 * input22 + self.weight23 * input23;
         let mut outputs = Vec::new();
@@ -304,7 +304,7 @@ impl InputNeuron{
         input20: f32,
         input21: f32,
         input22: f32,
-        input23: f32
+        input23: f32,
     ) -> f32{
         // Adjustment of neuron weights according to offset and input
         self.weight1 = self.weight1 + offset * input1;
@@ -312,6 +312,24 @@ impl InputNeuron{
         self.weight3 = self.weight3 + offset * input3;
         self.weight4 = self.weight4 + offset * input4;
         self.weight5 = self.weight5 + offset * input5;
+        self.weight6 = self.weight6 + offset * input6;
+        self.weight7 = self.weight7 + offset * input7;
+        self.weight8 = self.weight8 + offset * input8;
+        self.weight9 = self.weight9 + offset * input9;
+        self.weight10 = self.weight10 + offset * input10;
+        self.weight11 = self.weight11 + offset * input11;
+        self.weight12 = self.weight12 + offset * input12;
+        self.weight13 = self.weight13 + offset * input13;
+        self.weight14 = self.weight14 + offset * input14;
+        self.weight15 = self.weight15 + offset * input15;
+        self.weight16 = self.weight16 + offset * input16;
+        self.weight17 = self.weight17 + offset * input17;
+        self.weight18 = self.weight18 + offset * input18;
+        self.weight19 = self.weight19 + offset * input19;
+        self.weight20 = self.weight20 + offset * input20;
+        self.weight21 = self.weight21 + offset * input21;
+        self.weight22 = self.weight22 + offset * input22;
+        self.weight23 = self.weight23 + offset * input23;
         self.bias = self.bias + offset;
         // Returns a value to show the train data that is was successful
         offset
