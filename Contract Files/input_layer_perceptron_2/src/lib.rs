@@ -50,7 +50,7 @@ pub struct InputNeuron2{
 
 #[ext_contract(higher_level_neuron)]
 pub trait MiddleNeuron{
-    fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32);
+    fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_output: f32);
     fn predict_raw(&self, input1: f32, input2: f32);
 }
 
@@ -91,7 +91,7 @@ impl InputNeuron2{
     pub fn new() -> Self{
         let rand = env::random_seed();
         Self {
-            weight1: if rand[22] > 128u8 { rand[0] as f32 } else { -1f32 * (rand[0] as f32) },
+            weight1: if rand[23] > 128u8 { rand[0] as f32 } else { -1f32 * (rand[0] as f32) },
             weight2: if rand[0] > 128u8 { rand[1] as f32 } else { -1f32 * (rand[1] as f32) },
             weight3: if rand[1] > 128u8 { rand[2] as f32 } else { -1f32 * (rand[2] as f32)},
             weight4: if rand[2] > 128u8 {rand[3] as f32} else {-1f32 * (rand[3] as f32)},
@@ -144,14 +144,14 @@ impl InputNeuron2{
         input23: f32,
         mut outputs: Vec<f32>, 
         mut input_vector: Vec<Vec<f32>>, 
-        expected_ouput: f32
+        expected_output: f32
     ){
         let weighted_sum: f32 = self.bias + input1 * self.weight1 + input2 * self.weight2 + input3 * self.weight3 + input4 * self.weight4 + input5 * self.weight5 + input6 * self.weight6 + input7 * self.weight7 + input8 * self.weight8 + input9 * self.weight9 + input10 * self.weight10 + input11 * self.weight11 + input12 * self.weight12 + input13 * self.weight13 + input14 * self.weight14 + input15 * self.weight15 + input16 * self.weight16 +  input17 * self.weight17 + input18 * self.weight18 + input19 * self.weight19 + input20 * self.weight20 + input21 * self.weight21 + input22 * self.weight22 + input23 * self.weight23;
         outputs.push(self.tanh(weighted_sum));
         input_vector.push(outputs);
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 20u64 - BASE_GAS * 5/4);
-        higher_level_neuron::predict(input_vector[1][0], input_vector[1][1], input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
+        higher_level_neuron::predict(input_vector[1][0], input_vector[1][1], input_vector, expected_output, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
 
     pub fn predict_raw(

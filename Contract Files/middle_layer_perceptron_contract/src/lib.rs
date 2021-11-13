@@ -22,7 +22,7 @@ const BASE_GAS: u64 = 5_000_000_000_000;
 #[ext_contract(higher_level_neuron)]
 pub trait MiddleNeuron3{
     // The only method we need from the next neuron is the predict method
-    fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32);
+    fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_output: f32);
     fn predict_raw(&self, input1: f32, input2: f32, mut outputs: Vec<f32>);
 }
 
@@ -57,7 +57,7 @@ impl PerceptronWeights{
     }
 
     // ViewMethod predict, takes in the inputs as the previous layer's outputs, and collects outputs in a vector
-    pub fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_ouput: f32){
+    pub fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, input_vector: Vec<Vec<f32>>, expected_output: f32){
         // Calculates weighted sum with matrix multiplication of the input vector and the weight vector
         let weighted_sum: f32 = self.bias + input1 * self.weight1 + input2 * self.weight2;
 
@@ -69,7 +69,7 @@ impl PerceptronWeights{
         let gas_count = Gas::from(BASE_GAS * 18u64 - BASE_GAS * 5*3/4);
 
         // Cross-Contract call
-        higher_level_neuron::predict(input1, input2, outputs, input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
+        higher_level_neuron::predict(input1, input2, outputs, input_vector, expected_output, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
 
     // ChangeMethod adjust for training the nueral net
@@ -89,7 +89,7 @@ impl PerceptronWeights{
         let weighted_sum = self.bias  + self.weight1 * input1 + self.weight2 + input2;
         outputs.push(weighted_sum);
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = 0;
+        let gas_count = Gas::from(BASE_GAS * 18u64 - BASE_GAS * 5*3/4);
         higher_level_neuron::predict_raw(input1, input2, outputs, higher_level_neuron_account_id, NO_DEPOSIT, gas_count)
     }
 

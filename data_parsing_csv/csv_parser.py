@@ -1,6 +1,7 @@
 import pandas as pd
 from math import cos
 from math import sin
+import random
 
 possible_directions = {
     'N': 0.0,
@@ -36,6 +37,21 @@ def cast_direction_to_xy(direction):
     else: 
         return 0.0, 0.0
 
+
+def impute(data):
+    # Nessescary imputation done here
+    means = {}
+    possible_locations = set(data["Location"])
+
+    for location in possible_locations:
+        data[data["Location"] == location] = data[data["Location"] == location].fillna(data[data["Location"] == location].mean())
+    
+    data.fillna(data.mean(), inplace=True)
+    data.drop("Location", axis=1, inplace=True)
+
+    return data
+
+
 def main():
 
     # Translating Variables into being readable by the algorithm
@@ -66,19 +82,15 @@ def main():
     data["RainToday"] = list(map(cast_yes_no, list(data["RainToday"])))
     data["RainTomorrow"] = list(map(cast_yes_no, list(data["RainTomorrow"])))
 
+    # Splitting of the dataframe
+    training_set = data.sample(frac=0.75, random_state=1)
+    test_set = data[~data.isin(training_set)].dropna(how="all")
+    # data.to_csv("./weather_output.csv")
+    training_set = impute(training_set)
+    test_set = impute(test_set)
 
-    # Nessescary imputation done here
-    means = {}
-    possible_locations = set(data["Location"])
-
-    for location in possible_locations:
-        data[data["Location"] == location] = data[data["Location"] == location].fillna(data[data["Location"] == location].mean())
-
-
-    data.fillna(data.mean(), inplace=True)
-    data.drop("Location", axis=1, inplace=True)
-    print(data.info())
-    data.to_csv("./weather_output.csv")
+    training_set.to_csv("./training.csv")
+    test_set.to_csv("./test.csv")
 
     
 

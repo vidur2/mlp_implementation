@@ -46,14 +46,14 @@ impl MiddleNeuron3{
             bias: 0f32,
         }
     }
-    pub fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_ouput: f32){
+    pub fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_output: f32){
         let weighted_sum = self.bias + input1 * self.weight1 + input2 * self.weight2;
         outputs.push(self.sigmoid(weighted_sum));
         input_vector.push(outputs);
         // Casts environment constants to required type before passing them as the default parameters in a cross-contract call
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 17u64 - BASE_GAS * 5*4/4);
-        higher_level_neuron::predict(input_vector[2][0], input_vector[2][1], input_vector[2][2], input_vector, expected_ouput, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
+        higher_level_neuron::predict(input_vector[2][0], input_vector[2][1], input_vector[2][2], input_vector, expected_output, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
     pub fn adjust(&mut self, offset: f32, mut input_vector: Vec<Vec<f32>>){
         let input1 = input_vector[1][0];
@@ -73,7 +73,7 @@ impl MiddleNeuron3{
         outputs.push(self.sigmoid(weighted_sum));
         // Casts environment constants to required type before passing them as the default parameters in a cross-contract call
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
-        let gas_count = 0;
+        let gas_count = Gas::from(BASE_GAS * 17u64 - BASE_GAS * 5*4/4);
         higher_level_neuron::predict_raw(outputs[0], outputs[1], outputs[2], higher_level_neuron_account_id, NO_DEPOSIT, gas_count)
     }
 }
