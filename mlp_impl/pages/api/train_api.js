@@ -26,7 +26,7 @@ async function call_contract(row){
         }
     )
     const inputs = row.split(",")
-    result = contract.predict({
+    const result = contract.predict({
         args: {
             input1: parseFloat(inputs[0]),
             input2: parseFloat(inputs[1]),
@@ -62,7 +62,7 @@ async function call_contract(row){
 export default function handler(req, res){
     if (req.method == 'POST'){
         const reqBody = JSON.parse(req.body);
-        result = call_contract(reqBody.row_string)
+        const result = call_contract(reqBody.row_string)
         result.then((value) => {
             res.status(200).json({
                 status: "Succesful Request",

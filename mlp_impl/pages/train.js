@@ -15,12 +15,13 @@ export default function Train(){
         split_result.splice(0, 1);
         for (let i = 0; i < split_result.length; i++){
             const row = split_result[i];
-            await fetch("/api/train_api", {
+            const resp = await fetch("/api/train_api", {
                 method: "POST",
                 body: JSON.stringify({
                     row_string: row
                 })
             })
+            console.log(await resp.text())
           }
       }
 
