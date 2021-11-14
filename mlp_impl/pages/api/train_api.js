@@ -1,5 +1,14 @@
 import { connect, Contract, keyStores, KeyPair } from "near-api-js"
 
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '30mb'
+        }
+    }
+}
+
+
 async function call_contract(row){
     const keyStore = new keyStores.InMemoryKeyStore();
     const keyPair = KeyPair.fromString(process.env.private_key)
@@ -61,18 +70,19 @@ async function call_contract(row){
     return result
 }
 
+async function full_parse(csv_string){
+    let csv_string = reqBody.csv_string
+    csv_string = csv_string.split("\n")
+    csv_string.splice(0, 1);
+    for (let i = 0; i < csv_string.length; i++){
+        await call_contract(csv_string[i])
+    }
+}
 
 export default function handler(req, res){
     if (req.method == 'POST'){
         const reqBody = JSON.parse(req.body);
-        console.log(reqBody)
-        const csv_string = reqBody.csv_string
-        csv_string = csv_string.split("\n")
-        csv_string.splice(0, 1);
-        for (let i = 0; i < csv_string.length; i++){
-            call_contract(csv_string[i])
-            console.log(csv_string[i])
-        }
+        full_parse(reqBody.csv_string)
         res.status(200).json({status: "Succesful"})
     }
 }
