@@ -52,7 +52,7 @@ impl PerceptronWeights{
         Self {
             weight1: -4f32,
             weight2: 2f32,
-            bias: 0f32,
+            bias: 1f32,
         }
     }
 

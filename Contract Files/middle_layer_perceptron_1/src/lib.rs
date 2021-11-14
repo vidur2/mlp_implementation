@@ -70,7 +70,7 @@ impl MiddleNeuron{
         Self{
             weight1: -6f32,
             weight2: -10f32,
-            bias: 0f32
+            bias: 1f32
         }
     }
     pub fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_output: f32){
