@@ -12,7 +12,7 @@ export default function Train(){
         event.preventDefault();
         const string_result = result.target.result.toString();
         console.log(string_result)
-        await fetch("http://localhost:3000/api/train_api", {
+        await fetch("/api/train_api", {
             method: "POST",
             body: JSON.stringify({
                 csv_string: string_result
