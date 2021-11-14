@@ -54,20 +54,25 @@ async function call_contract(row){
             expected_output: parseFloat(inputs[17]),
         },
         gas: 115_000_000_000_000,
+    }).then((value) => {
+        console.log(value)
     })
 
     return result
 }
 
+
 export default function handler(req, res){
     if (req.method == 'POST'){
         const reqBody = JSON.parse(req.body);
-        const result = call_contract(reqBody.row_string)
-        result.then((value) => {
-            res.status(200).json({
-                status: "Succesful Request",
-                nearApi: value
-            })
-        })
+        console.log(reqBody)
+        const csv_string = reqBody.csv_string
+        csv_string = csv_string.split("\n")
+        csv_string.splice(0, 1);
+        for (let i = 0; i < csv_string.length; i++){
+            call_contract(csv_string[i])
+            console.log(csv_string[i])
+        }
+        res.status(200).json({status: "Succesful"})
     }
 }
