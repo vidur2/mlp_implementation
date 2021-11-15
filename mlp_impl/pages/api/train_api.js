@@ -71,11 +71,12 @@ async function call_contract(row){
 }
 
 async function full_parse(csv_string){
-    let csv_string = reqBody.csv_string
     csv_string = csv_string.split("\n")
     csv_string.splice(0, 1);
+    let resp;
     for (let i = 0; i < csv_string.length; i++){
-        await call_contract(csv_string[i])
+        resp = await call_contract(csv_string[i])
+        console.log(await resp)
     }
 }
 
