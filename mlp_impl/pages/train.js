@@ -11,13 +11,26 @@ export default function Train(){
     file_reader.onload = async function(result) { 
         event.preventDefault();
         const string_result = result.target.result.toString();
-        console.log(string_result)
-        await fetch("/api/train_api", {
-            method: "POST",
-            body: JSON.stringify({
-                csv_string: string_result
+        let current_array;
+        let ctr;
+        for (let i = 0; i < string_result.length; i += 18182){
+            current_array = string_result.slice(i, i + 18181)
+            await fetch("/api/train_api", {
+                method: "POST",
+                body: JSON.stringify({
+                    csv_string: current_array
+                })
             })
-        })
+            ctr = i;
+        }
+        if (ctr < string_result.length - 1){
+            await fetch("/api/train_api", {
+                method: "POST",
+                body: JSON.stringify({
+                    csv_string: string_result.slice(ctr, string_result.length - 1)
+                })
+            })
+        }
         // window.location.reload()
       }
 

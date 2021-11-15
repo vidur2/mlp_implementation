@@ -213,7 +213,6 @@ impl InputNeuron{
     // ViewMethod Predict burns no gas
     pub fn predict_raw(
         &self,
-        offset: f32, 
         input1: f32, 
         input2: f32, 
         input3: f32, 

@@ -1,4 +1,5 @@
 import { connect, Contract, keyStores, KeyPair } from "near-api-js"
+import delay from "delay"
 
 export const config = {
     api: {
@@ -7,7 +8,6 @@ export const config = {
         }
     }
 }
-
 
 async function call_contract(row){
     const keyStore = new keyStores.InMemoryKeyStore();
@@ -83,7 +83,10 @@ async function full_parse(csv_string){
 export default function handler(req, res){
     if (req.method == 'POST'){
         const reqBody = JSON.parse(req.body);
-        full_parse(reqBody.csv_string)
-        res.status(200).json({status: "Succesful"})
+        full_parse(reqBody.csv_string).then(() => {
+            res.status(200).json({
+                status: "Succesful"
+            })
+        })
     }
 }
