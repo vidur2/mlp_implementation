@@ -11,18 +11,14 @@ export default function Train(){
     file_reader.onload = async function(result) { 
         event.preventDefault();
         const string_result = result.target.result.toString();
-        const split_result = string_result.split("\n")
-        split_result.splice(0, 1);
-        for (let i = 0; i < split_result.length; i++){
-            const row = split_result[i];
-            const resp = await fetch("/api/train_api", {
-                method: "POST",
-                body: JSON.stringify({
-                    row_string: row
-                })
+        console.log(string_result)
+        await fetch("/api/train_api", {
+            method: "POST",
+            body: JSON.stringify({
+                csv_string: string_result
             })
-            console.log(await resp.text())
-          }
+        })
+        window.location.reload()
       }
 
     }
