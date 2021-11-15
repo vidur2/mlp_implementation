@@ -18,7 +18,7 @@ export default function Train(){
                 csv_string: string_result
             })
         })
-        window.location.reload()
+        // window.location.reload()
       }
 
     }
