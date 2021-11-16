@@ -1,5 +1,4 @@
 import { connect, Contract, keyStores, KeyPair } from "near-api-js"
-import delay from "delay"
 
 export const config = {
     api: {
