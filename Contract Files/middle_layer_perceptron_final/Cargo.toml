@@ -9,7 +9,7 @@ edition = "2021"
 near-sdk = "4.0.0-pre.4"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["cdylib"]
 
 [profile.release]
 codegen-units = 1
