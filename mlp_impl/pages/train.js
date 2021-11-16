@@ -10,11 +10,13 @@ export default function Train(){
     file_reader.readAsText(file);
     file_reader.onload = async function(result) { 
         event.preventDefault();
-        const string_result = result.target.result.toString();
+        let string_result = result.target.result.toString();
+        const split_result = string_result.split("\n")
         let current_array;
         let ctr;
-        for (let i = 0; i < string_result.length; i += 18182){
-            current_array = string_result.slice(i, i + 18181)
+        for (let i = 0; i < split_result.length; i += 18182){
+            current_array = split_result.slice(i, i + 18181)
+            current_array = current_array.join("\n")
             await fetch("/api/train_api", {
                 method: "POST",
                 body: JSON.stringify({
