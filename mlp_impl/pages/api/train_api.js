@@ -39,7 +39,7 @@ async function call_contract(csv_string, counter){
         }
     )
     const inputs = row.split(",")
-    contract.predict({
+    const resp = await contract.predict({
         args: {
             input1: parseFloat(inputs[0]),
             input2: parseFloat(inputs[1]),
@@ -67,16 +67,14 @@ async function call_contract(csv_string, counter){
             expected_output: parseFloat(inputs[17]),
         },
         gas: 115_000_000_000_000,
-    }).then((value) => {
-        console.log(value)
-        fetch("https://mlp-implementation.vercel.app/api/train_api", {
-            method: 'POST',
-            body: JSON.stringify({
-                counter: counter + 1
-            })
-        })
-        return csv_string
     })
+    fetch("http://localhost:3000/api/train_api", {
+        method: 'POST',
+        body: JSON.stringify({
+            counter: counter + 1
+        })
+    })
+    return await resp
 }
 
 export default function handler(req, res){
@@ -91,9 +89,11 @@ export default function handler(req, res){
     }
     else if (req.method == 'POST'){
         if (stored_data.length != 0){
-            call_contract(stored_data, parseInt(reqBody.counter)).then(() => {
+            call_contract(stored_data, parseInt(reqBody.counter)).then(async(value) => {
+                console.log(value)
                 res.status(200).json({
-                    status: "Succesful"
+                    status: "Succesful",
+                    nearApi: value
                 })
             })
         }

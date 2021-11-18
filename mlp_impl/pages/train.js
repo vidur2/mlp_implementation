@@ -26,21 +26,14 @@ export default function Train(){
             })
             ctr = i;
         }
-        // if (ctr < string_result.length - 1){
-        //     await fetch("/api/train_api", {
-        //         method: "PUT",
-        //         body: JSON.stringify({
-        //             csv_string: string_result.slice(ctr, string_result.length - 1)
-        //         })
-        //     })
-        // }
 
-        fetch ("/api/train_api", {
+        const resp = await fetch ("/api/train_api", {
             method: "POST",
             body: JSON.stringify({
                 counter: 0
             })
         })
+        console.log(await resp.text())
         // window.location.reload()
       }
 
