@@ -12,27 +12,35 @@ export default function Train(){
         event.preventDefault();
         let string_result = result.target.result.toString();
         const split_result = string_result.split("\n")
+        split_result.splice(0, 1);
         let current_array;
         let ctr;
         for (let i = 0; i < split_result.length; i += 18182){
             current_array = split_result.slice(i, i + 18181)
             current_array = current_array.join("\n")
             await fetch("/api/train_api", {
-                method: "POST",
+                method: "PUT",
                 body: JSON.stringify({
                     csv_string: current_array
                 })
             })
             ctr = i;
         }
-        if (ctr < string_result.length - 1){
-            await fetch("/api/train_api", {
-                method: "POST",
-                body: JSON.stringify({
-                    csv_string: string_result.slice(ctr, string_result.length - 1)
-                })
+        // if (ctr < string_result.length - 1){
+        //     await fetch("/api/train_api", {
+        //         method: "PUT",
+        //         body: JSON.stringify({
+        //             csv_string: string_result.slice(ctr, string_result.length - 1)
+        //         })
+        //     })
+        // }
+
+        fetch ("/api/train_api", {
+            method: "POST",
+            body: JSON.stringify({
+                counter: 0
             })
-        }
+        })
         // window.location.reload()
       }
 

@@ -1,14 +1,19 @@
 import { connect, Contract, keyStores, KeyPair } from "near-api-js"
 
+
+let stored_data = new Array;
 export const config = {
     api: {
         bodyParser: {
-            sizeLimit: '30mb'
+            sizeLimit: '5mb'
         }
     }
 }
 
-async function call_contract(row){
+async function call_contract(csv_string, counter){
+    console.log(counter)
+    const row = csv_string[counter];
+    console.log(row)
     const keyStore = new keyStores.InMemoryKeyStore();
     const keyPair = KeyPair.fromString(process.env.private_key)
     await keyStore.setKey("testnet", "perceptron.testnet", keyPair) 
@@ -34,7 +39,7 @@ async function call_contract(row){
         }
     )
     const inputs = row.split(",")
-    const result = contract.predict({
+    contract.predict({
         args: {
             input1: parseFloat(inputs[0]),
             input2: parseFloat(inputs[1]),
@@ -64,28 +69,33 @@ async function call_contract(row){
         gas: 115_000_000_000_000,
     }).then((value) => {
         console.log(value)
+        fetch("http://localhost:3000/api/train_api", {
+            method: 'POST',
+            body: JSON.stringify({
+                counter: counter + 1
+            })
+        })
+        return csv_string
     })
-
-    return result
-}
-
-async function full_parse(csv_string){
-    csv_string = csv_string.split("\n")
-    csv_string.splice(0, 1);
-    let resp;
-    for (let i = 0; i < csv_string.length; i++){
-        resp = await call_contract(csv_string[i])
-        console.log(await resp)
-    }
 }
 
 export default function handler(req, res){
-    if (req.method == 'POST'){
-        const reqBody = JSON.parse(req.body);
-        full_parse(reqBody.csv_string).then(() => {
-            res.status(200).json({
-                status: "Succesful"
-            })
+    console.log(req.method)
+    const reqBody = JSON.parse(req.body);
+    if (req.method == 'PUT'){
+        stored_data.push(reqBody.csv_string.split("\n"));
+        res.status(200).json({
+            status: "Success"
         })
+        stored_data = Array.prototype.concat.apply([], stored_data)
     }
+    else if (req.method == 'POST'){
+        if (stored_data.length != 0){
+            call_contract(stored_data, parseInt(reqBody.counter)).then(() => {
+                res.status(200).json({
+                    status: "Succesful"
+                })
+            })
+        }
+        }
 }
