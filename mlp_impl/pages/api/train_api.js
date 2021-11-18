@@ -68,7 +68,7 @@ async function call_contract(csv_string, counter){
         },
         gas: 115_000_000_000_000,
     })
-    fetch("http://localhost:3000/api/train_api", {
+    fetch("https://mlp-implementation.vercel.app/api/train_api", {
         method: 'POST',
         body: JSON.stringify({
             counter: counter + 1
