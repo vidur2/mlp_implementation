@@ -78,7 +78,6 @@ async function call_contract(csv_string){
         receiverId: "mlp1.perceptron.testnet",
         actions: actions
     })
-    return await resp
 }
 
 export default function handler(req, res){
@@ -91,15 +90,8 @@ export default function handler(req, res){
         })
         stored_data = Array.prototype.concat.apply([], stored_data)
     }
-    else if (req.method == 'POST'){
-        if (stored_data.length != 0){
-            call_contract(stored_data, parseInt(reqBody.counter)).then(async(value) => {
-                console.log(value)
-                res.status(200).json({
-                    status: "Succesful",
-                    nearApi: value
-                })
-            })
-        }
-        }
+    else if (req.method == 'POST' && stored_data.length != 0){
+        call_contract(stored_data)
+        res.status(200).json({  status: "Success" })
+    }
 }

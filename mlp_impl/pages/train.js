@@ -28,10 +28,7 @@ export default function Train(){
         }
 
         const resp = await fetch ("/api/train_api", {
-            method: "POST",
-            body: JSON.stringify({
-                counter: 0
-            })
+            method: "POST"
         })
         console.log(await resp.text())
         // window.location.reload()
