@@ -1,4 +1,4 @@
-import { connect, Contract, keyStores, KeyPair, transactions, utils } from "near-api-js"
+import { connect, Contract, keyStores, KeyPair, transactions } from "near-api-js"
 
 
 let stored_data = new Array;
@@ -74,7 +74,7 @@ async function call_contract(csv_string){
         ))
     }
     console.log(actions)
-    await account.signAndSendTransaction({
+    account.signAndSendTransaction({
         receiverId: "mlp1.perceptron.testnet",
         actions: actions
     })
