@@ -1,4 +1,4 @@
-import { connect, Contract, keyStores, KeyPair } from "near-api-js"
+import { connect, Contract, keyStores, KeyPair, transactions, utils } from "near-api-js"
 
 
 let stored_data = new Array;
@@ -10,10 +10,8 @@ export const config = {
     }
 }
 
-async function call_contract(csv_string, counter){
-    console.log(counter)
-    const row = csv_string[counter];
-    console.log(row)
+async function call_contract(csv_string){
+    let actions = new Array
     const keyStore = new keyStores.InMemoryKeyStore();
     const keyPair = KeyPair.fromString(process.env.private_key)
     await keyStore.setKey("testnet", "perceptron.testnet", keyPair) 
@@ -38,41 +36,47 @@ async function call_contract(csv_string, counter){
             sender: account,
         }
     )
-    const inputs = row.split(",")
-    const resp = await contract.predict({
-        args: {
-            input1: parseFloat(inputs[0]),
-            input2: parseFloat(inputs[1]),
-            input3: parseFloat(inputs[2]),
-            input4: parseFloat(inputs[3]),
-            input5: parseFloat(inputs[4]),
-            input6: parseFloat(inputs[5]),
-            input7: parseFloat(inputs[6]),
-            input8: parseFloat(inputs[7]),
-            input9: parseFloat(inputs[8]),
-            input10: parseFloat(inputs[9]),
-            input11: parseFloat(inputs[10]),
-            input12: parseFloat(inputs[11]),
-            input13: parseFloat(inputs[12]),
-            input14: parseFloat(inputs[13]),
-            input15: parseFloat(inputs[14]),
-            input16: parseFloat(inputs[15]),
-            input17: parseFloat(inputs[16]),
-            input18: parseFloat(inputs[23]),
-            input19: parseFloat(inputs[18]),
-            input20: parseFloat(inputs[19]),
-            input21: parseFloat(inputs[20]),
-            input22: parseFloat(inputs[21]),
-            input23: parseFloat(inputs[22]),
-            expected_output: parseFloat(inputs[17]),
-        },
-        gas: 115_000_000_000_000,
-    })
-    fetch("https://mlp-implementation.vercel.app/api/train_api", {
-        method: 'POST',
-        body: JSON.stringify({
-            counter: counter + 1
-        })
+    let args;
+    let splitter;
+    for (let i = 0; i < csv_string.length; i++){
+        splitter = csv_string[i].split(",")
+        args = {
+            input1: splitter[0],
+            input2: splitter[1],
+            input3: splitter[2],
+            input4: splitter[3],
+            input5: splitter[4],
+            input6: splitter[5],
+            input7: splitter[6],
+            input8: splitter[7],
+            input9: splitter[8],
+            input10: splitter[9],
+            input11: splitter[10],
+            input12: splitter[11],
+            input13: splitter[12],
+            input14: splitter[13],
+            input15: splitter[14],
+            input16: splitter[15],
+            input17: splitter[16],
+            input18: splitter[23],
+            input19: splitter[18],
+            input20: splitter[19],
+            input21: splitter[20],
+            input22: splitter[21],
+            input23: splitter[22],
+            expected_output: splitter[17],
+        }
+        actions.push(transactions.functionCall(
+            "predict",
+            JSON.stringify(args),
+            115_000_000_000_000,
+            "0"
+        ))
+    }
+    console.log(actions)
+    await account.signAndSendTransaction({
+        receiverId: "mlp1.perceptron.testnet",
+        actions: actions
     })
     return await resp
 }
