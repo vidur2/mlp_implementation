@@ -28,7 +28,7 @@ export default function Train(){
         }
 
         const resp = await fetch ("/api/train_api", {
-            method: "POST"
+            method: "GET"
         })
         console.log(await resp.text())
         // window.location.reload()
@@ -36,9 +36,16 @@ export default function Train(){
 
     }
     return(
-        <form onSubmit={parse_csv}>
-            <input type="file" name="file_input"></input>
-            <button type="submit">Submit</button>
-        </form>
+        <div className={styles.container}>
+            <Head>
+                <title>Training Page</title>
+            </Head>
+            <main className = {styles.main}>
+                <form onSubmit={parse_csv}>
+                    <input type="file" name="file_input"></input>
+                    <button type="submit">Submit</button>
+                </form>
+            </main>
+        </div>
     )
 }

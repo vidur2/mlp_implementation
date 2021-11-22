@@ -1,4 +1,5 @@
-import { connect, Contract, keyStores, KeyPair, transactions } from "near-api-js"
+import { connect, keyStores, KeyPair, transactions } from "near-api-js"
+import { TransactionManager } from "near-transaction-manager"
 
 
 let stored_data = new Array;
@@ -25,17 +26,7 @@ async function call_contract(csv_string){
     }
     const near = await connect(config)
     const account = await near.account("perceptron.testnet")
-    const contract = new Contract(
-        account,
-        "mlp1.perceptron.testnet",
-        {
-            changeMethods: [
-            "predict",
-            "predict_raw"
-            ],
-            sender: account,
-        }
-    )
+    const transactionManager = new TransactionManager.fromAccount(account)
     let args;
     let splitter;
     for (let i = 0; i < csv_string.length; i++){
@@ -68,29 +59,30 @@ async function call_contract(csv_string){
         }
         actions.push(transactions.functionCall(
             "predict",
-            JSON.stringify(args),
-            115_000_000_000_000,
+            Buffer.from(JSON.stringify(args)),
+            115_000_000_000,
             "0"
         ))
     }
     console.log(actions)
-    account.signAndSendTransaction({
+    const resp = await transactionManager.createSignAndSendTransaction({
         receiverId: "mlp1.perceptron.testnet",
         actions: actions
     })
+    console.log(resp)
 }
 
 export default function handler(req, res){
     console.log(req.method)
-    const reqBody = JSON.parse(req.body);
     if (req.method == 'PUT'){
+        const reqBody = JSON.parse(req.body);
         stored_data.push(reqBody.csv_string.split("\n"));
         res.status(200).json({
             status: "Success"
         })
         stored_data = Array.prototype.concat.apply([], stored_data)
     }
-    else if (req.method == 'POST' && stored_data.length != 0){
+    else if (req.method == 'GET' && stored_data.length != 0){
         call_contract(stored_data)
         res.status(200).json({  status: "Success" })
     }
