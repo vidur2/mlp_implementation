@@ -57,18 +57,17 @@ async function call_contract(csv_string){
             input23: splitter[22],
             expected_output: splitter[17],
         }
-        actions.push(transactions.functionCall(
-            "predict",
-            Buffer.from(JSON.stringify(args)),
-            115_000_000_000,
-            "0"
-        ))
+        actions.push({
+            receiverId: "mlp1.perceptron.testnet",
+            actions: [transactions.functionCall(
+                "predict",
+                Buffer.from(JSON.stringify(args)),
+                115_000_000_000,
+                "0"
+            )]
+        })
     }
-    console.log(actions)
-    const resp = await transactionManager.createSignAndSendTransaction({
-        receiverId: "mlp1.perceptron.testnet",
-        actions: actions
-    })
+    const resp = await transactionManager.bundleCreateSignAndSendTransactions(actions)
     console.log(resp)
 }
 
