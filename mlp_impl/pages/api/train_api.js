@@ -1,4 +1,4 @@
-import { connect, keyStores, KeyPair, transactions } from "near-api-js"
+import { connect, keyStores, KeyPair, Contract } from "near-api-js"
 import { BN } from "bn.js"
 import { TransactionManager } from "near-transaction-manager"
 
@@ -17,6 +17,17 @@ async function call_contract(csv_string){
     const keyStore = new keyStores.InMemoryKeyStore();
     const keyPair = KeyPair.fromString(process.env.private_key)
     await keyStore.setKey("testnet", "perceptron.testnet", keyPair) 
+    const contract = new Contract(
+        account,
+        "mlp1.perceptron.testnet",
+        {
+            changeMethods: [
+            "predict",
+            "predict_raw"
+            ],
+            sender: account,
+        }
+    )
     const config = {
         networkId: "testnet",
         keyStore,
@@ -60,12 +71,12 @@ async function call_contract(csv_string){
         }
         actions.push({
             receiverId: "mlp1.perceptron.testnet",
-            actions: [transactions.functionCall(
-                "predict",
-                Buffer.from(JSON.stringify(args)),
-                115_000_000_000,
-                []
-            )]
+            actions: [
+                contract.predict({
+                    args: args,
+                    gas: 115_000_000_000
+                })
+            ]
         })
     }
     console.log(actions)
