@@ -1,4 +1,5 @@
 import { connect, keyStores, KeyPair, transactions } from "near-api-js"
+import { BN } from "bn.js"
 import { TransactionManager } from "near-transaction-manager"
 
 
@@ -63,10 +64,11 @@ async function call_contract(csv_string){
                 "predict",
                 Buffer.from(JSON.stringify(args)),
                 115_000_000_000,
-                "0"
+                []
             )]
         })
     }
+    console.log(actions)
     const resp = await transactionManager.bundleCreateSignAndSendTransactions(actions)
     console.log(resp)
 }
