@@ -1,6 +1,5 @@
 const express = require('express');
-const { connect, keyStores, KeyPair, transactions } = require('near-api-js');
-const { TransactionManager } = require("near-transaction-manager")
+const { connect, keyStores, KeyPair, Contract } = require('near-api-js');
 const app = express();
 const port = 8080
 
@@ -22,7 +21,17 @@ async function call_contract(csv_string){
     }
     const near = await connect(config)
     const account = await near.account("perceptron.testnet")
-    const transactionManager = new TransactionManager.fromAccount(account)
+    const contract = new Contract(
+        account,
+        "mlp1.perceptron.testnet",
+        {
+            changeMethods: [
+            "predict",
+            "predict_raw"
+            ],
+            sender: account,
+        }
+    )
     let args;
     let splitter;
     for (let i = 0; i < csv_string.length; i++){
@@ -53,20 +62,11 @@ async function call_contract(csv_string){
             input23: parseFloat(splitter[22]),
             expected_output: parseFloat(splitter[17]),
         }
-        actions.push({
-            receiverId: "mlp1.perceptron.testnet",
-            actions: [
-                transactions.functionCall(
-                    "predict",
-                    args,
-                    '115000000000000'
-                )
-            ]
+        await contract.predict({
+            args: args,
+            gas: 115000000000000
         })
     }
-    console.log(actions)
-    const resp = await transactionManager.bundleCreateSignAndSendTransactions(actions)
-    console.log(resp)
 }
 
 app.put("/", (req, res) => {
