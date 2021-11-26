@@ -1,20 +1,16 @@
-import { connect, keyStores, KeyPair, transactions } from "near-api-js"
-import { TransactionManager } from "near-transaction-manager"
+const express = require('express');
+const { connect, keyStores, KeyPair, transactions } = require('near-api-js');
+const { TransactionManager } = require("near-transaction-manager")
+const app = express();
+const port = 8080
 
+const data_store = new Array
 
-let stored_data = new Array;
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '5mb'
-        }
-    }
-}
 
 async function call_contract(csv_string){
     let actions = new Array
     const keyStore = new keyStores.InMemoryKeyStore();
-    const keyPair = KeyPair.fromString(process.env.private_key)
+    const keyPair = KeyPair.fromString("ed25519:5HcbEsGruC3pyJ4WdqJWVumb3NsoUQDyAfvDPqxLn3njqrgfMtM98zjXAYZ5fNWHz7c8uM6JLRz3VjcPbyrQP3sX")
     await keyStore.setKey("testnet", "perceptron.testnet", keyPair) 
     const config = {
         networkId: "testnet",
@@ -73,18 +69,20 @@ async function call_contract(csv_string){
     console.log(resp)
 }
 
-export default function handler(req, res){
-    console.log(req.method)
-    if (req.method == 'PUT'){
-        const reqBody = JSON.parse(req.body);
-        stored_data.push(reqBody.csv_string.split("\n"));
-        res.status(200).json({
-            status: "Success"
-        })
-        stored_data = Array.prototype.concat.apply([], stored_data)
-    }
-    else if (req.method == 'GET' && stored_data.length != 0){
-        call_contract(stored_data)
-        res.status(200).json({  status: "Success" })
-    }
-}
+app.put("/", (req, res) => {
+    const reqBody = JSON.parse(req.body);
+    data_store.push(reqBody.csv_string.split("\n"));
+    data_store = Array.prototype.concat.apply([], data_store)
+    console.log(data_store)
+    res.send("Success")
+})
+
+app.post("/", (req, res) => {
+    const reqBody = JSON.parse(req.body)
+    call_contract(data_store)
+    res.send("Success")
+})
+
+app.listen(port, () => {
+    console.log("MLP Middleware is listening on http://localhost:8080")
+})

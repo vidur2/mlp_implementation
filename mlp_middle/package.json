@@ -1,0 +1,22 @@
+{
+  "name": "mlp_middle",
+  "version": "1.0.0",
+  "description": "middleware use of near-api-js and near transaction manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "near-api-js",
+    "near-transaction-manager",
+    "near"
+  ],
+  "author": "vidur2",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "near-api-js": "^0.43.1",
+    "near-transaction-manager": "^0.1.1"
+  }
+}
