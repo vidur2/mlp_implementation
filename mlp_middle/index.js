@@ -7,7 +7,6 @@ const data_store = new Array
 
 
 async function call_contract(csv_string){
-    let actions = new Array
     const keyStore = new keyStores.InMemoryKeyStore();
     const keyPair = KeyPair.fromString("ed25519:5HcbEsGruC3pyJ4WdqJWVumb3NsoUQDyAfvDPqxLn3njqrgfMtM98zjXAYZ5fNWHz7c8uM6JLRz3VjcPbyrQP3sX")
     await keyStore.setKey("testnet", "perceptron.testnet", keyPair) 
@@ -64,7 +63,7 @@ async function call_contract(csv_string){
         }
         await contract.predict({
             args: args,
-            gas: 115000000000000
+            gas: 115_000_000_000_000
         })
     }
 }
@@ -78,7 +77,6 @@ app.put("/", (req, res) => {
 })
 
 app.post("/", (req, res) => {
-    const reqBody = JSON.parse(req.body)
     call_contract(data_store)
     res.send("Success")
 })
