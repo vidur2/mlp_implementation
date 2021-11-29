@@ -1,40 +1,32 @@
 import styles from "../styles/Home.module.css"
 import Head from "next/head"
 
+async function getMetadataStore(file){
+    const res = await fetch('https://api.nft.storage/upload',{
+          body: file,
+          headers: {
+            "Authorization": "Bearer " + process.env.nft_store_api_key
+          },
+          method: 'POST',
+        })
+    return res.json()
+}
 
 export default function Train(){
     const parse_csv = async(event) =>{
-    event.preventDefault();
-    const file = event.target.file_input.files[0];
-    const file_reader = new FileReader;
-    file_reader.readAsText(file);
-    file_reader.onload = async function(result) { 
         event.preventDefault();
-        let string_result = result.target.result.toString();
-        const split_result = string_result.split("\n")
-        split_result.splice(0, 1);
-        let current_array;
-        let ctr;
-        for (let i = 0; i < split_result.length; i += 18182){
-            current_array = split_result.slice(i, i + 18181)
-            current_array = current_array.join("\n")
-            await fetch("/api/train_api", {
-                method: "PUT",
-                body: JSON.stringify({
-                    csv_string: current_array
-                })
+        const file = event.target.file_input.files[0];
+        const formBody = new URLSearchParams;
+        getMetadataStore(file).then((value) => {
+            console.log('https://ipfs.io/ipfs/' + value.value.cid)
+            formBody.append("metadata_url", value.value.cid)
+            fetch ("https://mlp-api.app.vtxhub.com/", {
+                method: "POST",
+                body: formBody
             })
-            ctr = i;
-        }
-
-        const resp = await fetch ("/api/train_api", {
-            method: "GET"
         })
-        console.log(await resp.text())
-        // window.location.reload()
       }
 
-    }
     return(
         <div className={styles.container}>
             <Head>
