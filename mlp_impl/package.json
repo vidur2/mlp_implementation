@@ -12,7 +12,6 @@
     "bn.js": "^5.2.0",
     "delay": "^5.0.0",
     "near-api-js": "^0.43.1",
-    "near-transaction-manager": "^0.1.1",
     "next": "^11.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2"
