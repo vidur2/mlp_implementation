@@ -83,11 +83,12 @@ def main():
     data["RainTomorrow"] = list(map(cast_yes_no, list(data["RainTomorrow"])))
 
     # Splitting of the dataframe
-    training_set = data.sample(frac=0.75, random_state=1)
+    training_set = data.sample(frac=0.1, random_state=1)
     test_set = data[~data.isin(training_set)].dropna(how="all")
     # data.to_csv("./weather_output.csv")
     training_set = impute(training_set)
     test_set = impute(test_set)
+    test_set = test_set[:5000]
 
     training_set.to_csv("./training.csv")
     test_set.to_csv("./test.csv")
