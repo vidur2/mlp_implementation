@@ -166,7 +166,7 @@ impl InputNeuron{
         input22: f32,
         input23: f32,
         expected_output: f32
-    ) -> &str{
+    ) -> usize{
         let weighted_sum: f32 = self.bias + self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3 + self.weight4 * input4 + self.weight5 * input5 + self.weight6 * input6 + self.weight7 * input7 + self.weight8 * input8 + self.weight9 * input9 + self.weight10 * input10 + self.weight11 * input11 + self.weight12 * input12 + self.weight13 * input13 + self.weight14 * input14 + self.weight15 * input15 + self.weight16 * input16 + self.weight17 * input17  + self.weight18 * input18 + self.weight19 * input19 + self.weight20 * input20 + self.weight21 * input21 + self.weight22 * input22 + self.weight23 * input23;
         let mut outputs = Vec::new();
         let mut inputs: Vec<Vec<f32>> = Vec::new();
@@ -176,6 +176,7 @@ impl InputNeuron{
         // Casts environment variables to nessescary type in order to make a cross-contract call
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 21u64);
+        let size = inputs[0].len();
         // Cross contract call to send infor to other neuron
         higher_level_neuron::predict(
             input1, 
@@ -208,7 +209,7 @@ impl InputNeuron{
             NO_DEPOSIT, 
             gas_count
         );
-        "Success"
+        size
     }
 
     // ViewMethod Predict burns no gas

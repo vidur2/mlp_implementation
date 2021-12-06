@@ -1,6 +1,7 @@
 import styles from "../styles/Home.module.css"
 import Head from "next/head"
 import { connect, Contract, keyStores, KeyPair } from "near-api-js"
+import { useEffect } from "react";
 
 
 export default function Predict(){
@@ -72,12 +73,12 @@ export default function Predict(){
     const windDir9am = document.getElementById("input19");
     const windDir3pm = document.getElementById("input20");
 
-    const windGustDirX = Math.cos(map.get(windGustDir));
-    const windGustDirY = Math.sin(map.get(windGustDir));
-    const windDir9amX = Math.cos(map.get(windGustDir));
-    const windDir9amY = Math.sin(map.get(windGustDir));
-    const windDir3pmX = Math.cos(map.get(windGustDir));
-    const windDir3pmY = Math.sin(map.get(windGustDir))
+    const windGustDirX = Math.cos(map.get(windGustDir.value));
+    const windGustDirY = Math.sin(map.get(windGustDir.value));
+    const windDir9amX = Math.cos(map.get(windDir9am.value));
+    const windDir9amY = Math.sin(map.get(windDir9am.value));
+    const windDir3pmX = Math.cos(map.get(windDir3pm.value));
+    const windDir3pmY = Math.sin(map.get(windGust3pm.value))
 
     body.innerHTML = "<h1>Loading...</h1>"
 
