@@ -88,10 +88,12 @@ def main():
     # data.to_csv("./weather_output.csv")
     training_set = impute(training_set)
     test_set = impute(test_set)
+    test_set.info()
+    test_set = test_set.drop("RainTomorrow", 1)
     test_set = test_set[:5000]
 
-    training_set.to_csv("./training.csv")
-    test_set.to_csv("./test.csv")
+    training_set.to_csv("./training.csv", index=False)
+    test_set.to_csv("./test.csv", index=False)
 
     
 
