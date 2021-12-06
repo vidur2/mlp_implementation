@@ -123,46 +123,45 @@ export default function Predict(){
       </Head>
       <main id = "body">
         <form onSubmit={contract_call}>
-          <input id="input1"></input>
+          Min Temp: <input id="input1"></input>
           <p></p>
-          <input id="input2"></input>
+          Max Temp: <input id="input2"></input>
           <p></p>
-          <input id="input3"></input>
+          Rainfall: <input id="input3"></input>
           <p></p>
-          <input id="input4"></input>
+          Evaporation: <input id="input4"></input>
           <p></p>
-          <input id="input5"></input>
+          Sunshine: <input id="input5"></input>
           <p></p>
-          <input id="input6"></input>
+          Wind Gust Speed: <input id="input6"></input>
           <p></p>
-          <input id="input7"></input>
+          Wind Speed 9am: <input id="input7"></input>
           <p></p>
-          <input id="input8"></input>
+          Wind Speed 3pm: <input id="input8"></input>
           <p></p>
-          <input id="input9"></input>
+          Humidity 9am: <input id="input9"></input>
           <p></p>
-          <input id="input10"></input>
+          Humidity 3pm: <input id="input10"></input>
           <p></p>
-          <input id="input11"></input>
+          Pressure 9am: <input id="input11"></input>
           <p></p>
-          <input id="input12"></input>
+          Pressure 3pm: <input id="input12"></input>
           <p></p>
-          <input id="input13"></input>
+          Cloud 9am: <input id="input13"></input>
           <p></p>
-          <input id="input14"></input>
+          Cloud 3pm: <input id="input14"></input>
           <p></p>
-          <input id="input15"></input>
+          Temp 9am: <input id="input15"></input>
           <p></p>
-          <input id="input16"></input>
+          Temp 3pm: <input id="input16"></input>
           <p></p>
-          <input id="input17"></input>
+          Rain Today: <input id="input17"></input>
           <p></p>
-          <input id="input18"></input>
+          Wind Gust Direction: <input id="input18"></input>
           <p></p>
-          <input id="input19"></input>
+          Wind Direction 9am: <input id="input19"></input>
           <p></p>
-          <input id="input20"></input>
-          <p></p>
+          Wind Direction 3pm: <input id="input20"></input>
           <p></p>
           <button type="submit">Submit</button>
         </form>
