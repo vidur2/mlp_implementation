@@ -1,7 +1,6 @@
 import styles from "../styles/Home.module.css"
 import Head from "next/head"
 import { connect, Contract, keyStores, KeyPair } from "near-api-js"
-import jsxToString from "jsx-to-string"
 
 
 export default function Predict(){
@@ -28,7 +27,6 @@ export default function Predict(){
 
   // Event handler for form submit
   const contract_call = async(event) => {
-    
     // Disables button onSubmit
     const button = document.getElementById("submit_button");
     button.disabled = true;
@@ -150,72 +148,16 @@ export default function Predict(){
       },
       115_000_000_000_000
     ).then((value) => {
-      const moreInfo = jsxToString(
-        <div>
-          <h1>ABOUT THIS MODEL</h1>
-          <table>
-            <tr>
-              <th>
-                <h2>The Math</h2>
-                <span>
-                  <p>The model structure is a multi-layer perceptron, the simplest</p>
-                  <p>form of a feed-forward neural network. Because the neural net was</p>
-                  <p>coded in Rustlang, it was coded from scratch. The linear algebra</p>
-                  <p>for the neural net is the same as a normal multi-layer perceptron</p>
-                  <p>with an input layer, a middle layer, and an output layer. Each layer</p>
-                  <p>is made up of simulated neurons, which use an activation function</p>
-                  <p>and weighted sum to simulate the 'action potential' firing</p>
-                  <p>of their organic counterparts. The activation function for</p>
-                  <p>each layer of the network is different. The first layer uses a</p>
-                  <p>hyperbolic tangent as the activation function, the second uses</p>
-                  <p>a logistic function, and the third uses a 'step function' to</p>
-                  <p>consolidate the values into a 1/0 output. The outputs of each</p>
-                  <p>layer's activation function become the inputs of the next layer</p>
-                  <p>and are hence forward propagated to generate an output. This</p>
-                  <p>output is then compared to an inputted expected output. The</p>
-                  <p>difference between the expected and actual output is then used</p>
-                  <p>to adjust the weights of each neuron, so it fires more accurately.</p>
-                </span>
-              </th>
-              {/* <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> */}
-              <th>
-                <h2>The Data</h2>
-                <span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                </span>
-              </th>
-            </tr>
-            <tr>
-              <th>
-                <h2>The Hosting</h2>
-                <span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                </span>
-              </th>
-              {/* <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> */}
-              <th>
-                <h2>Further Applications</h2>
-                <span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                </span>
-              </th>
-            </tr>
-          </table>
-        </div>
-      )
-      console.log(moreInfo)
       if(value === "1"){
         title.style.paddingLeft = "10%"
         title.style.fontSize = "30px"
         title.innerHTML = "<h1>Models Prediction: It will rain tomorrow</h1>"
         body.innerHTML = ""
-        entryText.innerHTML = moreInfo;
       }else {
         title.style.paddingLeft = "10%"
         title.style.fontSize = "30px"
         title.innerHTML = "<h1>Model's Prediction: It will not rain tomorrow</h1>"
         body.innerHTML = ""
-        entryText.innerHTML = moreInfo;
       }
   }).catch(() => {
     errorArea.textContent = 'Entered data is invalid'

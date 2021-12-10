@@ -11,14 +11,13 @@ export default function Home() {
         <title>Deep Learning MLP Implementation</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main>
         <h1 className="title" style={{fontSize: "35px"}}>
           Blockchain MLP: Weather Implementation
         </h1>
 
         <p className="description">
-          Get started by running a <a href="/predict" id="linkText">prediction</a>
+          Read about the project <a href="/about" id="linkText">here</a>
         </p>
 
         <div className="grid">
