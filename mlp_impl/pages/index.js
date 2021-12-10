@@ -13,8 +13,8 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1 className="title">
-          MLP Classifier
+        <h1 className="title" style={{fontSize: "35px"}}>
+          Blockchain MLP: Weather Implementation
         </h1>
 
         <p className="description">
@@ -27,7 +27,7 @@ export default function Home() {
             <p>Run a prediction and get output to see the model in action</p>
           </a>
 
-          <a href="/train" className="card">
+          <a className="card" style ={{border: "dashed", borderColor: "lightgray", borderWidth: "0.5px", color: "gray"}}>
             <h3>Train &rarr;</h3>
             <p>Train the algorithm on your own data</p>
           </a>
