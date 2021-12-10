@@ -174,7 +174,7 @@ export default function Predict(){
                   <p>and are hence forward propagated to generate an output. This</p>
                   <p>output is then compared to an inputted expected output. The</p>
                   <p>difference between the expected and actual output is then used</p>
-                  <p>to adjust the weights of each neuron, fires more accurately</p>
+                  <p>to adjust the weights of each neuron, so it fires more accurately.</p>
                 </span>
               </th>
               {/* <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td> */}
