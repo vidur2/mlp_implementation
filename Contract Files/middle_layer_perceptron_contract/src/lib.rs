@@ -87,7 +87,7 @@ impl PerceptronWeights{
 
     pub fn predict_raw(&self, input1: f32, input2: f32, mut outputs: Vec<f32>) -> near_sdk::Promise{
         let weighted_sum = self.bias  + self.weight1 * input1 + self.weight2 + input2;
-        outputs.push(weighted_sum);
+        outputs.push(self.sigmoid(weighted_sum));
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 18u64 - BASE_GAS * 5*3/4);
         higher_level_neuron::predict_raw(input1, input2, outputs, higher_level_neuron_account_id, NO_DEPOSIT, gas_count)

@@ -87,12 +87,15 @@ def main():
     test_set = data[~data.isin(training_set)].dropna(how="all")
     # data.to_csv("./weather_output.csv")
     training_set = impute(training_set)
+    training_set_cont = training_set.copy()
+    training_set_cont = training_set_cont[12655:]
     test_set = impute(test_set)
     test_set.info()
     test_set = test_set.drop("RainTomorrow", 1)
     test_set = test_set[:5000]
 
     training_set.to_csv("./training.csv", index=False)
+    training_set_cont.to_csv("./cont_training.csv", index=False)
     test_set.to_csv("./test.csv", index=False)
 
     
