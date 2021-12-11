@@ -6,4 +6,5 @@ The backend is hosted on the NEAR Protocol blockchain. You can learn more about 
 
 ### The model
 The model is the basic form of a 3-layer Multi-Layer Perceptron, with two input neurons, 3 hidden neurons, and an output neuron. The input layer uses a hyperbolic tangent activation function, the middle uses a sigmoidal activation function, and the output uses a step activation function to consolidate the inputs into a 0/1 output.
+
 <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy34_CeT3sV3jpkCm7GqZWSqfbdapSUaAQ2A&usqp=CAU"></img>
