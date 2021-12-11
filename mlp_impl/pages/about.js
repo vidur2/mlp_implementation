@@ -1,5 +1,6 @@
 import styles from "../styles/Home.module.css"
 import Head from "next/head"
+import Navbar from "../components/navbar"
 
 export default function About(){
     return(
@@ -37,7 +38,22 @@ export default function About(){
               <th>
                 <h2>The Data</h2>
                 <span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                  <p>The data is based on Australian weather readings, so the</p>
+                  <p>prediction is valid for that geographic area alone. A lot </p>
+                  <p>of imputation was done on the data during preprocessing.</p>
+                  <p>Note that the dataset is imbalanced so the trained model is</p>
+                  <p>biased towards predicting it will not rain tomorrow. This </p>
+                  <p> is because the model is aMulti-Layer Perceptron trained</p>
+                  <p>on a relatively small amount of data. With more data, this </p>
+                  <p> bias could be trained out of the model, however, only 15,000</p>
+                  <p>rows of data were used to train the model. If there were around</p>
+                  <p> 100,000 rows of data, then the model would be more accurate. </p>
+                  <p>With 15,000 rows, there are some techniques that could have </p>
+                  <p>been used to remove this bias, but it runs the risk of biasing</p>
+                  <p>the model towards the raining condition, due to the small amount</p>
+                  <p> of data. The reason an MLP was used as opposed to a Logistic</p>
+                  <p>Regression Model or Bayesian network is because this is a </p>
+                  <p>proof of concept for hosting prediction models using the blockchain.</p>
                 </span>
               </th>
             </tr>
