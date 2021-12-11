@@ -13,3 +13,6 @@ The model is the basic form of a 3-layer Multi-Layer Perceptron, with two input 
 An imbalanced dataset from kaggle was used to train the implementation for this model. Because the focus of the project was not on the data going into the model, but rather the model itself, the fact that the dataset was imbalanced was not considered during preprocessing.  
 During Preprocessing the data was: <ol><li>Casted into numeric inputs from categorical data if needed</li><li>Imputed if there was missing data in a row</li></ol>
 You can view the Kaggle Dataset [here](https://www.kaggle.com/jsphyg/weather-dataset-rattle-package)
+
+## The frontend
+The frontend is a javascript website built with Next.js and hosted on Vercel. I used Vercel because is built specifically for hosting Next.js websites. Next.js was used to build the frontend because it is built on top of React, which allowed different frontend elements to be imported from varius websites which also used React. This allowed me to focus more of my attention on the backend model of the project, and worry less about the frontend.
