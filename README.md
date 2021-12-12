@@ -2,7 +2,7 @@
 This project has a working deployment of an MLP (multi-layered perceptron) model on a blockchain as well as a weather implementation with a frontend to test demonstrate the model in action.
 
 ## The Code
-The code for this project can be seen in the Contract_Files folder (Backend), mlp_impl folder (frontend), and the mlp_middle folder (Work in Progress, bigger connection to the blockchain). 
+The code for this project can be seen in the Contract_Files folder (Backend), mlp_impl folder (frontend), data_parsing_csv folder (data science), and the mlp_middle folder (Work in Progress, bigger connection to the blockchain). 
 
 Bigger Commercial Impl Example folder is currently under development, so commits may happen in that folder as the judging process happens, however, this is not implemented into the deployed project you are seeing. You can see the code in the folder as a prototype for a more general case of the smart contracts in the Contract_Files folder.
 
