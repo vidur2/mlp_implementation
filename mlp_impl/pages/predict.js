@@ -262,7 +262,7 @@ export default function Predict(){
             <option>Yes</option>
           </select>
           <p></p>
-        <button type="submit" id="submit_button">Submit</button>
+        <button type="submit" id="submit_button" className={styles.button}>Submit</button>
         <div id = "Error Message" className={styles.error}></div>
         </form>
         <div id="entryText" className = {styles.inforPage}>
