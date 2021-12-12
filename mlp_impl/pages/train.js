@@ -31,6 +31,7 @@ export default function Train(){
         <div className={styles.container}>
             <Head>
                 <title>Training Page</title>
+                <link rel="icon" href="/logo.svg" />
             </Head>
             <main className = {styles.main}>
                 <form onSubmit={parse_csv}>

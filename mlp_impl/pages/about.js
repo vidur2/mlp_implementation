@@ -7,6 +7,7 @@ export default function About(){
         <div className={styles.inforPage}>
         <Head>
             <title>About</title>
+            <link rel="icon" href="/logo.svg" />
         </Head>
         <div className={styles.predict_head} id="title">
           <h1 className={styles.title} style={{textDecoration: "none", fontSize: "50px", color: "white"}}>About this Model</h1>

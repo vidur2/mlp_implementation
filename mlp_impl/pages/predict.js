@@ -168,6 +168,7 @@ export default function Predict(){
     <div className={styles.container}>
       <Head>
         <title>Predict</title>
+        <link rel="icon" href="/logo.svg" />
       </Head>
       <main id = "body" className={styles.body}>
       <div className={styles.predict_head} id="title">

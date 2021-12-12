@@ -9,7 +9,7 @@ export default function Home() {
     <div className="container">
       <Head>
         <title>Deep Learning MLP Implementation</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.svg" />
       </Head>
       <main>
         <h1 className="title" style={{fontSize: "35px"}}>
