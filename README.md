@@ -5,7 +5,7 @@ This project has a working deployment of an MLP (multi-layered perceptron) model
 The code for this project can be seen in the Contract_Files folder (Backend), mlp_impl folder (frontend), data_parsing_csv folder (data science), and the mlp_middle folder (Work in Progress, bigger connection to the blockchain). 
 
 Bigger Commercial Impl Example folder is currently under development, **so commits may happen in this folder** as the judging process happens, however, this is not implemented into the deployed project you are seeing. You can see the code in the folder as a prototype for a more general case of the smart contracts in the Contract_Files folder.
-<img src="https://bafkreiamqv2nrezjjbn7gb4ix3apz626dzov3d5hywrdiccielet6crnnm.ipfs.dweb.link/"></img>
+<img src="https://ibb.co/vDzWym9"></img>
 ## The Backend
 The backend is hosted on the NEAR Protocol blockchain. You can learn more about their mission [here](https://near.org). You can see how the neural network was trained, and how predictions from the website are handled [here](https://explorer.testnet.near.org/accounts/mlp1.perceptron.testnet). An example of a prediction can be seen [here](https://explorer.testnet.near.org/transactions/C1jtoRxfcv4yaQYkyHFsTQDwbmbMNS12j7Gvhs2nLWTT). 
 
