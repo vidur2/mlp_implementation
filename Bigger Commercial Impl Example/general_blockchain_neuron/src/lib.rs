@@ -5,7 +5,7 @@ use std::f64::consts::{E};
 const BASE_GAS: u64 = 5_000_000_000_000u64;
 const NO_DEPOSIT: Balance = 0;
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshDeserialize, BorshSerialize, Clone)]
 pub enum ActivationFunction{
     HyperTan,
     Logistic,
@@ -19,7 +19,7 @@ enum PropagationState{
     Backward
 }
 
-#[derive(Default, BorshDeserialize, BorshSerialize)]
+#[derive(Default, BorshDeserialize, BorshSerialize, Clone)]
 pub struct NeuralNetStructure{
     layer_structure: Vec<u64>,
     pos_x: usize,
@@ -33,6 +33,7 @@ impl Default for ActivationFunction{
 }
 
 #[derive(Default, BorshDeserialize, BorshSerialize)]
+#[derive(Clone)]
 #[near_bindgen]
 pub struct Neuron{
     weights: Vec<f32>,
@@ -81,12 +82,12 @@ impl Neuron{
     }
 
     pub fn enter_inputs(&mut self, inputs: Vec<f32>){
-        &self.inputs.append(&mut inputs.to_vec());
-        if inputs.len() == self.weights.len(){
-            &self.predict(&self.inputs);
+        self.inputs.append(&mut inputs.to_vec());
+        if self.inputs.len() == self.weights.len(){
+            self.predict(&self.inputs)    
         }
     }
-    fn predict(self, inputs: &Vec<f32>){
+    pub fn predict(&self, inputs: &Vec<f32>){
         let higher_level_neuron_account_id: AccountId = self.next_input.trim().parse().expect("Invalid Account Id");
         let mut weighted_sum: f32 = self.bias;
         if inputs.len() == self.weights.len(){
@@ -96,7 +97,8 @@ impl Neuron{
                 i += 1;
             }
         }
-        higher_level_neuron::enter_inputs(vec![self.activate(weighted_sum)], higher_level_neuron_account_id, NO_DEPOSIT, self.calculate_gas(PropagationState::Forward));
+        let gas_fee =  self.clone().calculate_gas(PropagationState::Forward);
+        higher_level_neuron::enter_inputs(vec![self.activate(weighted_sum)], higher_level_neuron_account_id, NO_DEPOSIT, gas_fee);
     }
     fn calculate_gas(self, state: PropagationState) -> Gas{
         let pos_y = self.mlp_structure.pos_y - 1usize;
@@ -112,8 +114,8 @@ impl Neuron{
             }
         }
         match state{
-            Forward => Gas::from((neurons_remaining as u64 - ((5/4) as u64) * neurons_passed) * (BASE_GAS as u64)),
-            Backward => Gas::from((neurons_remaining as u64 - (((5/4) as u64) * neurons_passed) - (2usize * self.mlp_structure.layer_structure.len()) as u64) * (BASE_GAS as u64))
+            PropagationState::Forward => Gas::from((neurons_remaining as u64 - ((5/4) as u64) * neurons_passed) * (BASE_GAS as u64)),
+            PropagationState::Backward => Gas::from((neurons_remaining as u64 - (((5/4) as u64) * neurons_passed) - (2usize * self.mlp_structure.layer_structure.len()) as u64) * (BASE_GAS as u64))
         }
     }
     fn activate(&self, sum: f32) -> f32{
