@@ -57,20 +57,6 @@ export default function About(){
                 </span>
               </th>
             </tr>
-            <tr>
-              <th>
-                <h2>The Hosting</h2>
-                <span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                </span>
-              </th>
-              <th>
-                <h2>Further Applications</h2>
-                <span>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                </span>
-              </th>
-            </tr>
           </table>
         </div>
     )
