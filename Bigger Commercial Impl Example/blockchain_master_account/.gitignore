@@ -1,0 +1,4 @@
+/target
+/neardev
+*.lock
+.DS_Store

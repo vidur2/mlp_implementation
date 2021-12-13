@@ -1,6 +1,5 @@
 import styles from "../styles/Home.module.css"
 import Head from "next/head"
-import Navbar from "../components/navbar"
 
 export default function About(){
     return(

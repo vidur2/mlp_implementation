@@ -48,6 +48,7 @@ pub struct InputNeuron2{
     bias: f32,
 }
 
+// Definition of next contract
 #[ext_contract(higher_level_neuron)]
 pub trait MiddleNeuron{
     fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_output: f32);
@@ -117,6 +118,8 @@ impl InputNeuron2{
             bias: 0f32,
         }
     }
+
+    // Forward propagation method
     pub fn predict(
         &self,
         input1: f32, 
@@ -146,14 +149,19 @@ impl InputNeuron2{
         mut input_vector: Vec<Vec<f32>>, 
         expected_output: f32
     ){
+        
+        // Neural net calulation
         let weighted_sum: f32 = self.bias + input1 * self.weight1 + input2 * self.weight2 + input3 * self.weight3 + input4 * self.weight4 + input5 * self.weight5 + input6 * self.weight6 + input7 * self.weight7 + input8 * self.weight8 + input9 * self.weight9 + input10 * self.weight10 + input11 * self.weight11 + input12 * self.weight12 + input13 * self.weight13 + input14 * self.weight14 + input15 * self.weight15 + input16 * self.weight16 +  input17 * self.weight17 + input18 * self.weight18 + input19 * self.weight19 + input20 * self.weight20 + input21 * self.weight21 + input22 * self.weight22 + input23 * self.weight23;
         outputs.push(self.tanh(weighted_sum));
         input_vector.push(outputs);
+
+        // Sending of values to next neuron
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 20u64 - BASE_GAS * 5/4);
         higher_level_neuron::predict(input_vector[1][0], input_vector[1][1], input_vector, expected_output, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
 
+    // Same calculation as predict method, but tells neural net not to train on this data
     pub fn predict_raw(
         &self,
         input1: f32, 
@@ -181,14 +189,17 @@ impl InputNeuron2{
         input23: f32,
         mut outputs: Vec<f32>
     ) -> near_sdk::Promise{
+        // Neural net calculation
         let weighted_sum: f32 = self.bias + input1 * self.weight1 + input2 * self.weight2 + input3 * self.weight3 + input4 * self.weight4 + input5 * self.weight5 + input6 * self.weight6 + input7 * self.weight7 + input8 * self.weight8 + input9 * self.weight9 + input10 * self.weight10 + input11 * self.weight11 + input12 * self.weight12 + input13 * self.weight13 + input14 * self.weight14 + input15 * self.weight15 + input16 * self.weight16 +  input17 * self.weight17 + input18 * self.weight18 + input19 * self.weight19 + input20 * self.weight20 + input21 * self.weight21 + input22 * self.weight22 + input23 * self.weight23;
         outputs.push(self.tanh(weighted_sum));
+
+        // Calling of next contract
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 20u64 - BASE_GAS * 5/4);
         higher_level_neuron::predict_raw(outputs[0], outputs[1], higher_level_neuron_account_id, NO_DEPOSIT, gas_count)
     }
 
-
+    // Backpropagation (training) method
     pub fn adjust(
         &mut self,
         offset: f32,
@@ -241,6 +252,8 @@ impl InputNeuron2{
         self.weight22 = self.weight22 + offset * input22;
         self.weight23 = self.weight23 + offset * input23;
         self.bias = self.bias + offset;
+
+        // Calling of next contract
         let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 12u64 - BASE_GAS * 5*9/4);
         lower_level_neuron::adjust(
@@ -273,6 +286,8 @@ impl InputNeuron2{
             gas_count
         );
     }
+
+    // Activation function
     fn tanh(&self, input_sum: f32) -> f32{
         input_sum.tanh()
     }

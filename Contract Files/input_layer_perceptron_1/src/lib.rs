@@ -108,7 +108,7 @@ pub trait InputNeuron2{
 // neuron functions
 #[near_bindgen]
 impl InputNeuron{
-    // Runs on Deploy
+    // Runs on Deploy, initializes the contract with a random state for each weight
     #[init]
     pub fn new() -> Self {
         let rand = env::random_seed();
@@ -212,7 +212,7 @@ impl InputNeuron{
         size
     }
 
-    // ViewMethod Predict burns no gas
+    // ViewMethod Predict burns no gas, tells neural net not to train on this data
     pub fn predict_raw(
         &self,
         input1: f32, 

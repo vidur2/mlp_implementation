@@ -120,6 +120,7 @@ export default function Predict(){
     input15 = (parseFloat(input15.value) - 32) * (5/9)
     input16 = (parseFloat(input16.value) - 32) * (5/9)
 
+    // Contract call to view output
     contract.predict_raw(
       {
         input1: input1,
@@ -148,6 +149,8 @@ export default function Predict(){
       },
       115_000_000_000_000
     ).then((value) => {
+
+      // Mutating frontend based on output
       if(value === "1"){
         title.style.paddingLeft = "10%"
         title.style.fontSize = "30px"
@@ -160,10 +163,13 @@ export default function Predict(){
         body.innerHTML = ""
       }
   }).catch(() => {
+
+    // Displays error text if one or more feilds are invalid
     errorArea.textContent = 'Entered data is invalid'
     button.disabled = false;
   });
   }
+
   return (
     <div className={styles.container}>
       <Head>

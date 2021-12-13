@@ -24,6 +24,7 @@ pub struct OutputNeuron{
     bias: f32,
 }
 
+// External contract definition
 #[ext_contract(lower_level_neuron)]
 pub trait MiddleNeuron3{
     fn adjust(&mut self, offset: f32, mut input_vector: Vec<Vec<f32>>);
@@ -31,6 +32,8 @@ pub trait MiddleNeuron3{
 
 #[near_bindgen]
 impl OutputNeuron {
+
+    // Initializing with random state
     #[init]
     pub fn new() -> Self {
         Self {
@@ -40,16 +43,26 @@ impl OutputNeuron {
             bias: 0f32,
         }
     }
+
+    // Predict method which calls own adjust method
     pub fn predict(&mut self, input1: f32, input2: f32, input3: f32, input_vector: Vec<Vec<f32>>, expected_output: f32){
+
+        // Nueral net math
         let weighted_sum: f32 = input1 * self.weight1 + input2 * self.weight2 + input3 * self.weight3 + self.bias;
         let offset = expected_output - self.step_function(weighted_sum);
+
+        // Adjusting of values
         let returned_values = self.train(offset, input_vector);
+
+        // Calls adjust on condition if expected_output != actual output
         if offset != 0f32{
             let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
             let gas_count = Gas::from(BASE_GAS * 16u64 - BASE_GAS * 5*5/4);
             lower_level_neuron::adjust(returned_values.1, returned_values.0, lower_level_neuron_account_id, NO_DEPOSIT, gas_count);
         }
     }
+
+    // Training method for own neuron
     fn train(&mut self, offset: f32, input_vector: Vec<Vec<f32>>) -> (Vec<Vec<f32>>, f32){
         self.weight1 = self.weight1 + input_vector[2][0] * offset;
         self.weight2 = self.weight2 + input_vector[2][1] * offset;
@@ -57,11 +70,13 @@ impl OutputNeuron {
         (input_vector, offset)
     }
 
+    // Method for viewing output without training
     pub fn predict_raw(&self, input1: f32, input2: f32, input3: f32) -> f32{
         let weighted_sum = self.weight1 * input1 + self.weight2 * input2 + self.weight3 * input3;
         self.step_function(weighted_sum)
     }
 
+    // Activation function
     fn step_function(&self, input_sum: f32) -> f32{
         if input_sum >= 0f32 {return 1f32}
         else{return 0f32}

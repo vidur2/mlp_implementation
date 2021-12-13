@@ -85,6 +85,7 @@ impl PerceptronWeights{
         lower_level_neuron::adjust(offset, input1, input2, input_vector, lower_level_neuron_id, NO_DEPOSIT, gas_count);
     }
 
+    // Same math as predict method, but tells neural net not to train
     pub fn predict_raw(&self, input1: f32, input2: f32, mut outputs: Vec<f32>) -> near_sdk::Promise{
         let weighted_sum = self.bias  + self.weight1 * input1 + self.weight2 + input2;
         outputs.push(self.sigmoid(weighted_sum));

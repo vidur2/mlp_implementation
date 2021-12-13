@@ -26,6 +26,7 @@ pub struct MiddleNeuron{
     bias: f32,
 }
 
+// Definition of contracts that this neuron interacts with
 #[ext_contract(higher_level_neuron)]
 pub trait PerceptronWeights{
     fn predict(&self, input1: f32, input2: f32, mut outputs: Vec<f32>, mut input_vector: Vec<Vec<f32>>, expected_output: f32);
@@ -65,6 +66,8 @@ pub trait InputNeuron2{
 
 #[near_bindgen]
 impl MiddleNeuron{
+
+    // Initializes state of contract
     #[init]
     pub fn new() -> Self {
         Self{
@@ -73,23 +76,36 @@ impl MiddleNeuron{
             bias: 1f32
         }
     }
+
+    // Forward propagation method
     pub fn predict(&self, input1: f32, input2: f32, mut input_vector: Vec<Vec<f32>>, expected_output: f32){
+        
+        // Neural network calculation
         let weighted_sum = self.bias  + self.weight1 * input1 + self.weight2 + input2;
         let mut outputs = Vec::new();
         outputs.push(self.sigmoid(weighted_sum));
+
+        // Putting into rest of network
         let higher_level_neuron_account_id: AccountId = HIGHER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 19u64 - BASE_GAS * 5*2/4);
         higher_level_neuron::predict(input1, input2, outputs, input_vector, expected_output, higher_level_neuron_account_id, NO_DEPOSIT, gas_count);
     }
+
+    // Backprogadation method
     pub fn adjust(&mut self, offset: f32, input1: f32, input2: f32, input_vector: Vec<Vec<f32>>){
+
+        // Adjusting neural net based on offsets
         self.weight1 = self.weight1 + offset * input1;
         self.weight2 = self.weight2 + offset * input2;
         self.bias = self.bias + offset;
+
+        // Calling of next contract
         let lower_level_neuron_account_id: AccountId = LOWER_LEVEL_NEURON_ID.to_string().trim().parse().expect("invalid");
         let gas_count = Gas::from(BASE_GAS * 13u64 - BASE_GAS * 5*8/4);
         lower_level_neuron::adjust(offset, input_vector[0][0], input_vector[0][1], input_vector[0][2], input_vector[0][3], input_vector[0][4], input_vector[0][5], input_vector[0][6], input_vector[0][7], input_vector[0][8], input_vector[0][9], input_vector[0][10], input_vector[0][11], input_vector[0][12], input_vector[0][13], input_vector[0][14],input_vector[0][15], input_vector[0][16], input_vector[0][17], input_vector[0][18], input_vector[0][19], input_vector[0][20], input_vector[0][21], input_vector[0][22], lower_level_neuron_account_id, NO_DEPOSIT, gas_count);
-
     }
+
+    // Predict method, requires less gas than the training predict method
     pub fn predict_raw(&self, input1: f32, input2: f32) -> near_sdk::Promise{
         let weighted_sum: f32 = self.weight1 * input1 + self.weight2 + self.bias;
         let mut outputs = Vec::new();

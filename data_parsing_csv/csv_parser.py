@@ -3,6 +3,7 @@ from math import cos
 from math import sin
 import random
 
+# HashMap of values to cast direction to numeric
 possible_directions = {
     'N': 0.0,
     'NNE': 45/2,
@@ -22,6 +23,7 @@ possible_directions = {
     'NNW': 15 * 45/2,
 }
 
+# Function which casts yes/no output to 0/1
 def cast_yes_no(current_elem):
     if current_elem == "Yes":
         return 1
@@ -31,9 +33,12 @@ def cast_yes_no(current_elem):
         return current_elem
 
 
+# Changes degree input to xy to minimize bias in model from 0-360 (ie higher numbers wold be useless)
 def cast_direction_to_xy(direction):
     if(direction in possible_directions):
         return cos(possible_directions[direction]), sin(possible_directions[direction])
+
+    # Imputes a value of (0,0) if no wind dir is given to minimize bias
     else: 
         return 0.0, 0.0
 
@@ -85,7 +90,6 @@ def main():
     # Splitting of the dataframe
     training_set = data.sample(frac=0.1, random_state=1)
     test_set = data[~data.isin(training_set)].dropna(how="all")
-    # data.to_csv("./weather_output.csv")
     training_set = impute(training_set)
     training_set_cont = training_set.copy()
     training_set_cont = training_set_cont[12655:]
