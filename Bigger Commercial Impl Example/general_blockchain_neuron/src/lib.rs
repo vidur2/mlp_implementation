@@ -40,9 +40,8 @@ pub struct Neuron{
     inputs: Vec<f32>,
     activation_function: ActivationFunction,
     bias: f32,
-    previous_input: String,
-    next_input: String,
     mlp_structure: NeuralNetStructure,
+    master_account: String,
 }
 
 #[ext_contract(higher_level_neuron)]
@@ -50,10 +49,15 @@ pub trait Neuron{
     fn enter_inputs(inputs: Vec<f32>);
 }
 
+#[ext_contract(lower_level_neuron)]
+pub trait Neuron{
+    fn adjust(offset: f32);
+}
+
 #[near_bindgen]
 impl Neuron{
     #[init]
-    pub fn new(num_weights: u32, function_type: String, layer: f32, previous_input: String, next_input: String, layer_structure: Vec<u64>, pos_x: usize, pos_y: usize) -> Self{
+    pub fn new(num_weights: u32, function_type: String, layer: f32, layer_structure: Vec<u64>, pos_x: usize, pos_y: usize, master_account: String) -> Self{
         let mlp_structure = NeuralNetStructure {
             layer_structure: layer_structure,
             pos_x: pos_x,
@@ -75,20 +79,20 @@ impl Neuron{
             inputs: Vec::new(),
             activation_function: activation_function,
             bias: layer - 1f32,
-            previous_input: previous_input.trim().parse().expect("Invalid account id"),
-            next_input: next_input.trim().parse().expect("Invalid account id"),
-            mlp_structure: mlp_structure
+            mlp_structure: mlp_structure,
+            master_account: master_account,
         }
     }
 
-    pub fn enter_inputs(&mut self, inputs: Vec<f32>){
+    pub fn enter_inputs(&mut self, inputs: Vec<f32>) -> std::option::Option<f32>{
         self.inputs.append(&mut inputs.to_vec());
         if self.inputs.len() == self.weights.len(){
-            self.predict(&self.inputs)    
+            return self.predict(&self.inputs);  
+        }else{
+            return std::option::Option::None;
         }
     }
-    pub fn predict(&self, inputs: &Vec<f32>){
-        let higher_level_neuron_account_id: AccountId = self.next_input.trim().parse().expect("Invalid Account Id");
+    pub fn predict(&self, inputs: &Vec<f32>) -> Option<f32>{
         let mut weighted_sum: f32 = self.bias;
         if inputs.len() == self.weights.len(){
             let mut i = 0;
@@ -97,8 +101,56 @@ impl Neuron{
                 i += 1;
             }
         }
-        let gas_fee =  self.clone().calculate_gas(PropagationState::Forward);
-        higher_level_neuron::enter_inputs(vec![self.activate(weighted_sum)], higher_level_neuron_account_id, NO_DEPOSIT, gas_fee);
+        let gas_fee = self.clone().calculate_gas(PropagationState::Forward);
+        let account_ids = self.find_acct_ids(PropagationState::Forward);
+        
+        match account_ids{
+            Some(account_ids) => {
+                for account in account_ids.iter(){
+                    higher_level_neuron::enter_inputs(vec![self.activate(weighted_sum)], account.clone(), NO_DEPOSIT, gas_fee);
+                }
+                return None
+            }
+            None => {
+                // Call adjust function here
+                let result = self.activate(weighted_sum);
+                return Option::Some(result)
+            }
+        }
+    }
+    fn find_acct_ids(&self, state: PropagationState) -> Option<Vec<AccountId>>{
+        let mut acct_ids: Vec<AccountId> = Vec::new(); 
+        let index = self.mlp_structure.pos_y - 1usize;
+        let mut sum = self.mlp_structure.layer_structure[index];
+        match state{
+            PropagationState::Forward => { 
+                if index + 1usize < self.mlp_structure.layer_structure.len(){
+                    for _ in 1..self.mlp_structure.layer_structure[index + 1usize]{
+                        sum += 1;
+                        let next_account_id: AccountId = format!("mlp{}.{}.testnet", sum, self.master_account).trim().parse().expect("Invalid Input");
+                        acct_ids.push(next_account_id);
+                    }
+                    let return_value = std::option::Option::Some(acct_ids);
+                    return return_value;
+                }else{
+                    return std::option::Option::None;
+                }
+            }
+            PropagationState::Backward => {
+                if index - 1usize > 0{
+                    for _ in 1..self.mlp_structure.layer_structure[index - 1usize]{
+                        sum += 1;
+                        let next_account_id: AccountId = format!("mlp{}.{}.testnet", sum, self.master_account).trim().parse().expect("Invalid Input");
+                        acct_ids.push(next_account_id);
+                    }
+                    let return_value = std::option::Option::Some(acct_ids);
+                    return return_value;
+                }
+                else{
+                    return std::option::Option::None;
+                }
+            }
+        }
     }
     fn calculate_gas(self, state: PropagationState) -> Gas{
         let pos_y = self.mlp_structure.pos_y - 1usize;
@@ -108,7 +160,7 @@ impl Neuron{
         for layer in pos_y..(self.mlp_structure.layer_structure.len() - 1usize){
             neurons_remaining += self.mlp_structure.layer_structure[layer] as u64;
             neurons_passed -= self.mlp_structure.layer_structure[layer] as u64;
-            if (layer == pos_y){
+            if layer == pos_y {
                 neurons_remaining -= pos_x as u64;
                 neurons_passed += pos_x as u64;
             }
