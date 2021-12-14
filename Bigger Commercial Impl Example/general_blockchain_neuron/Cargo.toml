@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 near-sdk = "4.0.0-pre.4"
-neural_net_obj = { path = "../neural_net_obj" }
+neural_net_obj = { git = "https://github.com/vidur2/mlp_implementation/" }
 
 [lib]
 crate-type = ["cdylib"]
