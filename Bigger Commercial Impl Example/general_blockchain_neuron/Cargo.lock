@@ -162,6 +162,7 @@ name = "general_blockchain_neuron"
 version = "0.1.0"
 dependencies = [
  "near-sdk",
+ "neural_net_obj",
 ]
 
 [[package]]
@@ -360,6 +361,13 @@ dependencies = [
  "serde",
  "sha2",
  "sha3",
+]
+
+[[package]]
+name = "neural_net_obj"
+version = "0.1.0"
+dependencies = [
+ "near-sdk",
 ]
 
 [[package]]

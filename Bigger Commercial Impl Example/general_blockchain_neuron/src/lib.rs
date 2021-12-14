@@ -1,3 +1,5 @@
+extern crate neural_net_obj;
+use neural_net_obj::{ActivationFunction, NeuralNetStructure};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::{near_bindgen, ext_contract, Gas, Balance, AccountId, Promise};
 use std::f64::consts::{E};
@@ -5,31 +7,10 @@ use std::f64::consts::{E};
 const BASE_GAS: u64 = 5_000_000_000_000u64;
 const NO_DEPOSIT: Balance = 0;
 
-#[derive(BorshDeserialize, BorshSerialize, Clone)]
-pub enum ActivationFunction{
-    HyperTan,
-    Logistic,
-    Linear,
-    Step
-}
-
 #[derive(BorshDeserialize, BorshSerialize)]
 enum PropagationState{
     Forward,
     Backward
-}
-
-#[derive(Default, BorshDeserialize, BorshSerialize, Clone)]
-pub struct NeuralNetStructure{
-    layer_structure: Vec<u64>,
-    pos_x: usize,
-    pos_y: usize
-}
-
-impl Default for ActivationFunction{
-    fn default() -> ActivationFunction{
-        ActivationFunction::Linear
-    }
 }
 
 #[derive(Default, BorshDeserialize, BorshSerialize)]
