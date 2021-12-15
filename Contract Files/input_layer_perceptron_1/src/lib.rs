@@ -1,5 +1,7 @@
 /*
-Testing of a multi-layer perceptron contract
+Vidur Modgil
+Tech Fair
+Backend
 1st neuron in the network
 */
 

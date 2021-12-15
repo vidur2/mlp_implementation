@@ -1,5 +1,7 @@
 /*
-Testing of a multi-layer perceptron contract
+Vidur Modgil
+Tech Fair
+Backend
 2nd neuron in the network
 */
 
