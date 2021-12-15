@@ -27,7 +27,7 @@ export default function Home() {
           </a>
 
           <a className="card" style ={{border: "dashed", borderColor: "lightgray", borderWidth: "0.5px", color: "gray"}}>
-            <h3>Train &rarr;</h3>
+            <h3>Deploy your own &rarr;</h3>
             <p>Train the algorithm on your own data</p>
           </a>
         </div>
