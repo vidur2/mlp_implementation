@@ -1,6 +1,6 @@
 use neural_net_obj::{ActivationFunction, NeuralNetStructure};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::{near_bindgen, ext_contract, Gas, Balance, AccountId, Promise};
+use near_sdk::{near_bindgen, ext_contract, Gas, Balance, AccountId};
 use std::f64::consts::{E};
 
 const BASE_GAS: u64 = 5_000_000_000_000u64;
@@ -104,7 +104,7 @@ impl Neuron{
                         self.adjust(offset);
                     }
                     None => {
-                        let first_acct_id: AccountId = format!("mlp1_{}.testnet", self.master_account)
+                        let first_acct_id: AccountId = format!("mlp1.{}.testnet", self.master_account)
                             .trim()
                             .parse()
                             .expect("Invalid Account id");
@@ -149,7 +149,7 @@ impl Neuron{
                 if index + 1usize < self.mlp_structure.layer_structure.len(){
                     for _ in 1..self.mlp_structure.layer_structure[index + 1usize]{
                         sum += 1;
-                        let next_account_id: AccountId = format!("mlp{}_{}.testnet", sum, self.master_account)
+                        let next_account_id: AccountId = format!("mlp{}.{}.testnet", sum, self.master_account)
                             .trim()
                             .parse()
                             .expect("Invalid Input");
@@ -168,7 +168,7 @@ impl Neuron{
                 if index - 1usize > 0 {
                     for _ in 1..self.mlp_structure.layer_structure[index - 1usize]{
                         sum -= 1;
-                        let next_account_id: AccountId = format!("mlp{}_{}.testnet", sum, self.master_account)
+                        let next_account_id: AccountId = format!("mlp{}.{}.testnet", sum, self.master_account)
                             .trim()
                             .parse()
                             .expect("Invalid Input");

@@ -366,7 +366,7 @@ dependencies = [
 [[package]]
 name = "neural_net_obj"
 version = "0.1.0"
-source = "git+https://github.com/vidur2/mlp_implementation/#09ba6508b1fe832c479d2fad129ade78fdc8b24a"
+source = "git+https://github.com/vidur2/mlp_implementation/#39f6cc24aa913110379d6c0bbaec7bc99a5ff454"
 dependencies = [
  "near-sdk",
 ]

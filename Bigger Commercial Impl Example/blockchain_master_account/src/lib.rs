@@ -18,7 +18,7 @@ impl NeuronGenerator{
         if env::attached_deposit() == required_deposit{
             self.account_ids.insert(user_id.clone(), amt_neurons);
             for account_num in 1..amt_neurons{
-                let account_id: AccountId = format!("mlp{}_{}.perceptron.testnet", account_num, user_id)
+                let account_id: AccountId = format!("mlp{}.{}.testnet", account_num, user_id)
                     .parse()
                     .expect("Invalid account id");
                     
