@@ -13,11 +13,14 @@ export default function Authentication(){
         connect(config).then((near) => {
             const wallet = new WalletConnection(near)
             wallet.requestSignIn({
-                contractId: "perceptron.testnet"
+                contractId: "perceptron.testnet",
+                successUrl: "http://localhost:3000/profile"
             })
         })
     }
     return(
-        <h1>Loading</h1>
+        <div>
+            <h1>Loading</h1>
+        </div>
     )
 }
