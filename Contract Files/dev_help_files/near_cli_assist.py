@@ -1,3 +1,9 @@
+"""
+Vidur Modgil
+Tech Fair
+Automation of 'Resetting' of Smart contracts on the NEAR blockchain
+"""
+
 import os, sys
 
 def main():
