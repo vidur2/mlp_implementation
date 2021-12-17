@@ -104,7 +104,7 @@ impl Neuron{
                         self.adjust(offset);
                     }
                     None => {
-                        let first_acct_id: AccountId = format!("mlp1.{}.testnet", self.master_account)
+                        let first_acct_id: AccountId = format!("mlp1.perceptron.{}.testnet", self.master_account)
                             .trim()
                             .parse()
                             .expect("Invalid Account id");
@@ -149,7 +149,7 @@ impl Neuron{
                 if index + 1usize < self.mlp_structure.layer_structure.len(){
                     for _ in 1..self.mlp_structure.layer_structure[index + 1usize]{
                         sum += 1;
-                        let next_account_id: AccountId = format!("mlp{}.{}.testnet", sum, self.master_account)
+                        let next_account_id: AccountId = format!("mlp{}.perceptron.{}.testnet", sum, self.master_account)
                             .trim()
                             .parse()
                             .expect("Invalid Input");
@@ -168,7 +168,7 @@ impl Neuron{
                 if index - 1usize > 0 {
                     for _ in 1..self.mlp_structure.layer_structure[index - 1usize]{
                         sum -= 1;
-                        let next_account_id: AccountId = format!("mlp{}.{}.testnet", sum, self.master_account)
+                        let next_account_id: AccountId = format!("mlp{}.perceptron.{}.testnet", sum, self.master_account)
                             .trim()
                             .parse()
                             .expect("Invalid Input");
