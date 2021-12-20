@@ -4,7 +4,7 @@ import router from "next/router"
 import Head from "next/head"
 
 async function get_contract(){
-    const resp = await fetch("http://localhost:3000/blockchain_master_account.wasm");
+    const resp = await fetch("https://mlp-implementation.vercel.app/blockchain_master_account.wasm");
     const ab = await resp.arrayBuffer();
     const uint8arrray = new Uint8Array(ab)
     return uint8arrray
@@ -104,7 +104,7 @@ export default function Profile(){
             }
             window.sessionStorage.setItem("nn_information", layerInformation.toString())
             const keyPair = KeyPair.fromRandom("ed25519");
-            // fetch("http://localhost:3000/api/contract_inter", {
+            // fetch("https://mlp-implementation.vercel.app/api/contract_inter", {
             //     method: "POST",
             //     body: JSON.stringify({
             //         account_id: `perceptron.${account.accountId}`,
