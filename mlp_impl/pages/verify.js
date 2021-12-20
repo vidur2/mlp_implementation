@@ -1,4 +1,6 @@
 import { connect, keyStores, WalletConnection } from "near-api-js"
+import styles from "../styles/Home.module.css"
+import { Spin } from "antd"
 
 export default function Authentication(){
     if (typeof window !== "undefined"){
@@ -14,13 +16,14 @@ export default function Authentication(){
             const wallet = new WalletConnection(near)
             wallet.requestSignIn({
                 contractId: "perceptron.testnet",
-                successUrl: "http://localhost:3000/profile"
+                successUrl: "http://localhost:3000/profile",
+                failuireUrl: "http://localhost:3000"
             })
         })
     }
     return(
-        <div>
-            <h1>Loading</h1>
+        <div className = {styles.container}>
+            <Spin />
         </div>
     )
 }

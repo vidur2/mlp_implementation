@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 const CODE: &[u8] = include_bytes!("../../general_blockchain_neuron.wasm");
 
+
 #[derive(BorshDeserialize, BorshSerialize, Default)]
 #[near_bindgen]
 pub struct NeuronGenerator{
