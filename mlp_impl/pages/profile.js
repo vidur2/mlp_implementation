@@ -4,7 +4,7 @@ import router from "next/router"
 import Head from "next/head"
 
 async function get_contract(){
-    const resp = await fetch("http://localhost:3000/blockchain_master_account.wasm");
+    const resp = await fetch(`http://${window.location.host}/blockchain_master_account.wasm`);
     const ab = await resp.arrayBuffer();
     const uint8arrray = new Uint8Array(ab)
     return uint8arrray
