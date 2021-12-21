@@ -103,13 +103,13 @@ export default function Profile(){
             }
             window.sessionStorage.setItem("nn_information", layerInformation.toString())
             const keyPair = KeyPair.fromRandom("ed25519");
-            fetch(`https://${window.location.host}/api/contract_inter`, {
-                method: "POST",
-                body: JSON.stringify({
-                    account_id: `perceptron.${account.accountId}`,
-                    private_key: keyPair.secretKey.toString()
-                })
-            })
+            // fetch(`https://${window.location.host}/api/contract_inter`, {
+            //     method: "POST",
+            //     body: JSON.stringify({
+            //         account_id: `perceptron.${account.accountId}`,
+            //         private_key: keyPair.secretKey.toString()
+            //     })
+            // })
             account.createAndDeployContract(`perceptron.${account.accountId}`, keyPair.getPublicKey(), wasm, utils.format.parseNearAmount("45"))
         })
     }
