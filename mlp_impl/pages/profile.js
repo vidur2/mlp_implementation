@@ -82,7 +82,6 @@ export default function Profile(){
         connect(config).then((near) => {
             const wallet = new WalletConnection(near);
             const account = wallet.account();
-            const accountId = account.accountId;
             const layerInformation = new Array;
             const layerStructure = new Array
             let offset = 0;
@@ -93,7 +92,7 @@ export default function Profile(){
                 layerStructure.push(layer_length)
                 for (let j = 0; j < layer_length; j++){
                     const information = {
-                        account: `mlp${j + offset + 1}.perceptron.${accountId}`,
+                        account: `mlp${j + offset + 1}.perceptron.${account.accountId}`,
                         act_func: act_func,
                         pos_x: j + 1,
                         pos_y: i + 1
