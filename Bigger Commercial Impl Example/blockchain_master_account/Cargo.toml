@@ -9,6 +9,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 near-sdk = "4.0.0-pre.4"
+neural_net_obj = { path = "../neural_net_obj" }
 
 [lib]
 crate-type = ["cdylib"]

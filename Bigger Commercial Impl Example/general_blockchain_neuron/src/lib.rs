@@ -43,7 +43,7 @@ pub trait Neuron {
 #[near_bindgen]
 impl Neuron{
     #[init]
-    pub fn new(num_weights: u32, function_type: String, layer: f32, layer_structure: Vec<u64>, pos_x: usize, pos_y: usize, master_account: String) -> Self{
+    pub fn new(num_weights: u32, function_type: String, layer_structure: Vec<u64>, pos_x: usize, pos_y: usize, master_account: String) -> Self{
         let mlp_structure = NeuralNetStructure {
             layer_structure: layer_structure,
             pos_x: pos_x,
@@ -64,7 +64,7 @@ impl Neuron{
             weights: weights,
             inputs: Vec::new(),
             activation_function: activation_function,
-            bias: layer - 1f32,
+            bias: (pos_y as f32) - 1f32,
             mlp_structure: mlp_structure,
             master_account: master_account,
             output: None

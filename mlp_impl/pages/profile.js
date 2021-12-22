@@ -1,13 +1,64 @@
 import { WalletConnection, keyStores, connect, KeyPair, utils, transactions, Contract } from "near-api-js";
 import styles from "../styles/Home.module.css"
-import router from "next/router"
 import Head from "next/head"
 
 async function get_contract(){
-    const resp = await fetch(`https://${window.location.host}/blockchain_master_account.wasm`);
+    const resp = await fetch(`http://${window.location.host}/blockchain_master_account.wasm`);
     const ab = await resp.arrayBuffer();
     const uint8arrray = new Uint8Array(ab)
     return uint8arrray
+}
+
+function parse_nn(nn_information){
+    for (let i = 0; i < nn_information.length; i++){
+        if (nn_information[i][nn_information[i].length - 1] != "}"){
+            nn_information[i] = nn_information[i] + '}'
+        }
+        nn_information[i] = JSON.parse(nn_information[i])
+    }
+    return nn_information;
+}
+
+async function generate_mlp(nn_information, perceptron_account){
+    const wasm = await get_contract()
+    const contract_id = perceptron_account.accountId
+    console.log(perceptron_account)
+    perceptron_account.deployContract(wasm).then(() => {
+        nn_information = nn_information.split("},")
+        nn_information = parse_nn(nn_information)
+        const amt_neurons = parseInt((nn_information[nn_information.length-1]).account.split("p")[1].split(".")[0]);
+        perceptron_account.functionCall(
+            contract_id,
+            "generate_mlp",
+            {
+                amt_neurons: amt_neurons
+            }
+        ).then(() => {
+                let layer_amt = new Array;
+                let activation_function = new Array;
+                for (let i = 0; i < nn_information.length; i++){
+                    if (nn_information[i].pos_y != nn_information[i - 1].pos_y){
+                        activation_function.push(nn_information[i].activation_function);
+                        layer_amt.push(nn_information[i].amt_in_layer);
+                    }
+                }
+                let amt_inputs;
+                if (window.sessionStorage.getItem("amt_inputs") != null){
+                    amt_inputs = parseInt(window.sessionStorage.getItem("amt_inputs"))
+                }else {
+                    amt_inputs = parseInt(window.localStorage.getItem("amt_inputs"))
+                }
+                perceptron_account.functionCall(
+                    contract_id,
+                    "initialize_mlp",
+                    {
+                        input_amt: amt_inputs,
+                        layer_amt: layer_amt,
+                        activation_function: activation_function,
+                    }
+                )
+            })
+        })
 }
 
 export default function Profile(){
@@ -31,32 +82,36 @@ export default function Profile(){
                 console.log(window.location.href.indexOf("error"))
                 if (window.location.href.indexOf("error") != -1 && window.localStorage.getItem("nn_information") == null){
                     window.localStorage.setItem("nn_information", window.sessionStorage.getItem("nn_information"))
+                    window.localStorage.setItem("amt_inputs", window.sessionStorage.getItem("amt_inputs"))
                 }
                 nn_information = window.sessionStorage.getItem("nn_information");
                 if (nn_information == null){
                     nn_information = window.localStorage.getItem("nn_information")
                 }
+                nn_information.split("}")
                 if (wallet.isSignedIn()){
-                    const contract_id = `perceptron.${account.accountId}`
-                    nn_information = nn_information.split("},")
-                    console.log(nn_information)
-                    for (let i = 0; i < nn_information.length; i++){
-                        if (nn_information[i][nn_information[i].length - 1] != "}"){
-                            nn_information[i] = nn_information[i] + '}'
+                    config.keyStore.getAccounts().then((accounts) => {
+                        if (accounts.indexOf(`perceptron.${account.accountId}`) == -1){
+                            fetch(`http://${window.location.host}/api/get_account_pk`, {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    account_id: `perceptron.${account.accountId}`
+                                })
+                            }).then((response) => {
+                                response.json().then((response_information) => {
+                                    const keyPair = KeyPair.fromString(response_information.private_key)
+                                    config.keyStore.setKey("testnet", `perceptron.${account.accountId}`, keyPair)
+                                    near.account(`perceptron.${account.accountId}`).then((account) => {
+                                        generate_mlp(nn_information, account);
+                                    })
+                                })
+                            })
+                        } else {
+                            near.account(`perceptron.${account.accountId}`).then((account) => {
+                                generate_mlp(nn_information, account);
+                            })
                         }
-                        nn_information[i] = JSON.parse(nn_information[i])
-                    }
-                    const amt_neurons = parseInt((nn_information[nn_information.length-1]).account.split("p")[1].split(".")[0]);
-                    let gas_amt = utils.format.parseNearAmount("0") * amt_neurons;
-                    account.functionCall(
-                        contract_id,
-                        "generate_mlp",
-                        {
-                            amt_neurons: amt_neurons
-                        },
-                        gas_amt,
-                        utils.format.parseNearAmount("20")
-                    )
+                    })
                 }
                 body.innerHTML = "";
             }catch (err){
@@ -69,8 +124,7 @@ export default function Profile(){
     }
     const handleTransaction = async(event) => {
         event.preventDefault();
-        const wasm = await get_contract()
-        
+        window.sessionStorage.setItem("amt_inputs", document.getElementById("inputAmount").value)
         const config = {
             networkId: "testnet",
             keyStore: new keyStores.BrowserLocalStorageKeyStore(),
@@ -95,7 +149,8 @@ export default function Profile(){
                         account: `mlp${j + offset + 1}.perceptron.${account.accountId}`,
                         act_func: act_func,
                         pos_x: j + 1,
-                        pos_y: i + 1
+                        pos_y: i + 1,
+                        amt_in_layer: layer_length
                     }
                     layerInformation.push(JSON.stringify(information))
                 }
@@ -103,14 +158,17 @@ export default function Profile(){
             }
             window.sessionStorage.setItem("nn_information", layerInformation.toString())
             const keyPair = KeyPair.fromRandom("ed25519");
-            // fetch(`https://${window.location.host}/api/contract_inter`, {
-            //     method: "POST",
-            //     body: JSON.stringify({
-            //         account_id: `perceptron.${account.accountId}`,
-            //         private_key: keyPair.secretKey.toString()
-            //     })
-            // })
-            account.createAndDeployContract(`perceptron.${account.accountId}`, keyPair.getPublicKey(), wasm, utils.format.parseNearAmount("45"))
+            fetch(`http://${window.location.host}/api/contract_inter`, {
+                method: "POST",
+                body: JSON.stringify({
+                    account_id: `perceptron.${account.accountId}`,
+                    private_key: keyPair.secretKey.toString()
+                })
+            })
+            config.keyStore.setKey("testnet", `perceptron.${account.accountId}`, keyPair)
+            const amt_neurons = get_amt_neurons(layerInformation);
+            const deposit_calc = 45 + (25 * amt_neurons);
+            account.createAccount(`perceptron.${account.accountId}`, keyPair.getPublicKey(), utils.format.parseNearAmount(deposit_calc.toString()))
         })
     }
 
@@ -152,6 +210,7 @@ export default function Profile(){
                 </div>
                 <main className={styles.main} style={{paddingTop: "3%"}} id="body">
                     <form onSubmit={handleTransaction}>
+                        Amount of inputs: <input type="text" id="inputAmount"></input>
                         Layer 1 Information: <input id="input1" placeholder="Amount of Neurons"></input>
                         <select id="act_func_1">
                             <option>Act Func</option>

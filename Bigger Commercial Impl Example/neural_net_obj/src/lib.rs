@@ -7,7 +7,6 @@ pub struct NeuralNetStructure{
     pub pos_y: usize
 }
 
-
 #[derive(BorshDeserialize, BorshSerialize, Clone)]
 pub enum ActivationFunction{
     HyperTan,
