@@ -3,7 +3,7 @@ import styles from "../styles/Home.module.css"
 import Head from "next/head"
 
 async function get_contract(){
-    const resp = await fetch(`http://${window.location.host}/blockchain_master_account.wasm`);
+    const resp = await fetch(`https://${window.location.host}/blockchain_master_account.wasm`);
     const ab = await resp.arrayBuffer();
     const uint8arrray = new Uint8Array(ab)
     return uint8arrray
@@ -107,7 +107,7 @@ export default function Profile(){
                 if (wallet.isSignedIn()){
                     config.keyStore.getAccounts().then((accounts) => {
                         if (accounts.indexOf(`perceptron.${account.accountId}`) == -1){
-                            fetch(`http://${window.location.host}/api/get_account_pk`, {
+                            fetch(`https://${window.location.host}/api/get_account_pk`, {
                                 method: "POST",
                                 body: JSON.stringify({
                                     account_id: `perceptron.${account.accountId}`
@@ -177,7 +177,7 @@ export default function Profile(){
             }
             window.sessionStorage.setItem("nn_information", layerInformation.toString())
             const keyPair = KeyPair.fromRandom("ed25519");
-            fetch(`http://${window.location.host}/api/contract_inter`, {
+            fetch(`https://${window.location.host}/api/contract_inter`, {
                 method: "POST",
                 body: JSON.stringify({
                     account_id: `perceptron.${account.accountId}`,
