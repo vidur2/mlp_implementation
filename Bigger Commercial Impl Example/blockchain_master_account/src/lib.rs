@@ -27,7 +27,7 @@ impl Default for NeuronGenerator {
 }
 
 #[ext_contract(sub_neuron)]
-pub trait Neuron{
+pub trait Neuron {
     fn new(num_weights: u32, function_type: String, layer_structure: Vec<u64>, pos_x: usize, pos_y: usize, master_account: String);
 }
 
@@ -36,7 +36,7 @@ impl NeuronGenerator {
     pub fn generate_mlp(&mut self, amt_neurons: u64){
         let account: String = env::current_account_id().to_string();
         self.account_ids.insert(&account.clone(), &amt_neurons);
-        for account_num in 1..amt_neurons{
+        for account_num in 1..amt_neurons + 1{
             let account_id: AccountId = format!("mlp{}.{}", account_num, account)
                 .parse()
                 .expect("Invalid account id");
@@ -58,12 +58,12 @@ impl NeuronGenerator {
             let layer_num = layer_amt[counter as usize];
             for i in layer_start..layer_start + layer_num as usize{
                 let account_id: AccountId = format!("mlp{}.{}", i, account).trim().parse().expect("Not an account id");
-                if layer_start == 1usize {
+                if counter == 0 {
                     num_weights = input_amt
                 } else {
                     num_weights = layer_amt[counter - 1] as u32
                 }
-                sub_neuron::new(num_weights, layer.to_string(), layer_amt.clone(), (i + 1) - layer_start, counter, master_account.clone(), account_id, NO_DEPOSIT, Gas::from(BASE_GAS));
+                sub_neuron::new(num_weights, layer.to_string(), layer_amt.clone(), (i + 1) - layer_start, counter + 1, master_account.clone(), account_id, NO_DEPOSIT, Gas::from(BASE_GAS));
             }
             layer_start += layer_num as usize;
             counter += 1;

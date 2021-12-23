@@ -26,19 +26,26 @@ async function generate_mlp(nn_information, perceptron_account){
     perceptron_account.deployContract(wasm).then(() => {
         nn_information = nn_information.split("},")
         nn_information = parse_nn(nn_information)
-        const amt_neurons = parseInt((nn_information[nn_information.length-1]).account.split("p")[1].split(".")[0]);
+        const amt_neurons = parseInt(window.sessionStorage.getItem("amt_neurons"))
         perceptron_account.functionCall(
             contract_id,
             "generate_mlp",
             {
                 amt_neurons: amt_neurons
-            }
+            },
+            "50000000000000"
         ).then(() => {
                 let layer_amt = new Array;
                 let activation_function = new Array;
+                let current_iter;
+                let prev_iter;
                 for (let i = 0; i < nn_information.length; i++){
-                    if (nn_information[i].pos_y != nn_information[i - 1].pos_y){
-                        activation_function.push(nn_information[i].activation_function);
+                    current_iter = nn_information[i].pos_y
+                    if (i > 0){
+                        prev_iter = nn_information[i - 1].pos_y
+                    }
+                    if (current_iter != prev_iter){
+                        activation_function.push(nn_information[i].act_func);
                         layer_amt.push(nn_information[i].amt_in_layer);
                     }
                 }
@@ -55,7 +62,8 @@ async function generate_mlp(nn_information, perceptron_account){
                         input_amt: amt_inputs,
                         layer_amt: layer_amt,
                         activation_function: activation_function,
-                    }
+                    },
+                    "50000000000000"
                 )
             })
         })
@@ -63,7 +71,8 @@ async function generate_mlp(nn_information, perceptron_account){
 
 export default function Profile(){
     let counter = 1;
-    const ids = new Array;
+    const ids = new Array();
+    ids.push("input1")
     if (typeof window !== "undefined"){
         const body = document.getElementById("body")
         const config = {
@@ -88,7 +97,13 @@ export default function Profile(){
                 if (nn_information == null){
                     nn_information = window.localStorage.getItem("nn_information")
                 }
+
+                if (nn_information === "null"){
+                    breakThing
+                }
+                
                 nn_information.split("}")
+                console.log(nn_information)
                 if (wallet.isSignedIn()){
                     config.keyStore.getAccounts().then((accounts) => {
                         if (accounts.indexOf(`perceptron.${account.accountId}`) == -1){
@@ -101,6 +116,7 @@ export default function Profile(){
                                 response.json().then((response_information) => {
                                     const keyPair = KeyPair.fromString(response_information.private_key)
                                     config.keyStore.setKey("testnet", `perceptron.${account.accountId}`, keyPair)
+                                    console.log(config.keyStore)
                                     near.account(`perceptron.${account.accountId}`).then((account) => {
                                         generate_mlp(nn_information, account);
                                     })
@@ -122,6 +138,9 @@ export default function Profile(){
             }
         })
     }
+
+
+    // Handles form submission
     const handleTransaction = async(event) => {
         event.preventDefault();
         window.sessionStorage.setItem("amt_inputs", document.getElementById("inputAmount").value)
@@ -166,7 +185,22 @@ export default function Profile(){
                 })
             })
             config.keyStore.setKey("testnet", `perceptron.${account.accountId}`, keyPair)
-            const amt_neurons = get_amt_neurons(layerInformation);
+            let amt_neurons = 0;
+            for (let i = 0; i < layerInformation.length; i++){
+                const layer = layerInformation[i];
+                let prev_layer;
+                if (i > 0){
+                    prev_layer = layerInformation[i - 1];
+                } else{
+                    prev_layer = layerInformation[layerInformation.length - 1]
+                }
+                console.log(layer)
+                if (JSON.parse(prev_layer).pos_y != JSON.parse(layer).pos_y){
+                    const neuron_amt_in_layer = parseInt(JSON.parse(layer).amt_in_layer);
+                    amt_neurons = neuron_amt_in_layer + amt_neurons;  
+                }
+            }
+            window.sessionStorage.setItem("amt_neurons", amt_neurons.toString())
             const deposit_calc = 45 + (25 * amt_neurons);
             account.createAccount(`perceptron.${account.accountId}`, keyPair.getPublicKey(), utils.format.parseNearAmount(deposit_calc.toString()))
         })
@@ -211,6 +245,7 @@ export default function Profile(){
                 <main className={styles.main} style={{paddingTop: "3%"}} id="body">
                     <form onSubmit={handleTransaction}>
                         Amount of inputs: <input type="text" id="inputAmount"></input>
+                        <p></p>
                         Layer 1 Information: <input id="input1" placeholder="Amount of Neurons"></input>
                         <select id="act_func_1">
                             <option>Act Func</option>

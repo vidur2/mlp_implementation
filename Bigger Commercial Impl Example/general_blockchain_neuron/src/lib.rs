@@ -52,7 +52,7 @@ impl Neuron{
         let rand = near_sdk::env::random_seed();
         let mut weights = Vec::new();
         for i in 0..(num_weights as usize) - (1 as usize) {
-            weights.push((rand[i] - 128u8) as f32)
+            weights.push((rand[i] as f32 - 128f32) as f32)
         }
         let activation_function = match function_type.as_str() {
             "tanh" | "Hyperbolic Tangent" => ActivationFunction::HyperTan,
