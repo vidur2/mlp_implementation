@@ -52,7 +52,7 @@ pub struct Neuron{
 
 #[ext_contract(higher_level_neuron)]
 pub trait Neuron{
-    fn enter_inputs(inputs: Vec<f32>);
+    fn enter_inputs(inputs: Vec<f32>, expected_output: Option<f32>);
 }
 
 #[ext_contract(lower_level_neuron)]
@@ -114,6 +114,10 @@ impl Neuron{
             self.weights.clone()
         }
     }
+    pub fn clear(&mut self){
+        self.inputs = Vec::new();
+    }
+
     pub fn predict(&mut self, inputs: &Vec<f32>, expected_output: Option<f32>){
         let mut weighted_sum: f32 = self.bias;
         if inputs.len() == self.weights.len(){
@@ -130,12 +134,13 @@ impl Neuron{
                 let gas_fee = self.clone().calculate_gas(PropagationState::Forward);
                 for account in account_ids.iter(){
                     println!("{}", account);
-                    higher_level_neuron::enter_inputs(vec![action_potential], account.clone(), NO_DEPOSIT, gas_fee);
+                    higher_level_neuron::enter_inputs(vec![action_potential], expected_output, account.clone(), NO_DEPOSIT, gas_fee);
                 }
             }
             None => {
                 match expected_output {
                     Some(expected_output) => {
+                        println!("{}", expected_output);
                         let result = self.activate(weighted_sum);
                         let offset = expected_output - result;
                         self.adjust(offset);
