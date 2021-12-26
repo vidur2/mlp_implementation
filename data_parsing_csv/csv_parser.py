@@ -1,7 +1,12 @@
 import pandas as pd
 from math import cos
 from math import sin
+import numpy as np
+import matplotlib.pyplot as plt
+from imblearn.under_sampling import RandomUnderSampler
+from sklearn.model_selection import train_test_split
 import random
+import seaborn as sns
 
 # HashMap of values to cast direction to numeric
 possible_directions = {
@@ -86,21 +91,34 @@ def main():
 
     data["RainToday"] = list(map(cast_yes_no, list(data["RainToday"])))
     data["RainTomorrow"] = list(map(cast_yes_no, list(data["RainTomorrow"])))
-
+    data = data[data["RainTomorrow"].notna()]
+    print(data["RainTomorrow"].describe())
     # Splitting of the dataframe
-    training_set = data.sample(frac=0.1, random_state=1)
-    test_set = data[~data.isin(training_set)].dropna(how="all")
-    training_set = impute(training_set)
-    training_set_cont = training_set.copy()
-    training_set_cont = training_set_cont[12655:]
-    test_set = impute(test_set)
-    test_set.info()
-    test_set = test_set.drop("RainTomorrow", 1)
-    test_set = test_set[:5000]
+    x_df = data[data.columns[data.columns != "RainTomorrow"]]
+    y_df = data["RainTomorrow"]
+    rus = RandomUnderSampler(random_state=0)
+    x_resampled, y_resampled = rus.fit_resample(x_df, y_df)
+    fully_resampled = pd.concat([x_resampled, y_resampled.to_frame()])
+    subset = fully_resampled.sample(frac=0.15, random_state=0)
+    subset_x = subset[subset.columns[subset.columns != "RainTomorrow"]]
+    subset_y = subset["RainTomorrow"].to_frame()
+    x_train, x_test, y_train, y_test = train_test_split(subset_x, subset_y)
+    full_train = pd.concat([x_train, y_train])
+    columns = x_train.columns
+    for column in columns:
+        ax = sns.boxplot(x=column, y = "RainTomorrow", data=full_train)
+        plt.show(ax)
+    # training_set = impute(training_set)
+    # training_set_cont = training_set.copy()
+    # training_set_cont = training_set_cont[12655:]
+    # test_set = impute(test_set)
+    # test_set.info()
+    # test_set = test_set.drop("RainTomorrow", 1)
+    # test_set = test_set[:5000]
 
-    training_set.to_csv("./training.csv", index=False)
-    training_set_cont.to_csv("./cont_training.csv", index=False)
-    test_set.to_csv("./test.csv", index=False)
+    # training_set.to_csv("./training.csv", index=False)
+    # training_set_cont.to_csv("./cont_training.csv", index=False)
+    # test_set.to_csv("./test.csv", index=False)
 
     
 
