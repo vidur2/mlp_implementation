@@ -8,7 +8,7 @@ const NO_DEPOSIT: Balance = 0;
 
 #[repr(u8)]
 #[derive(BorshDeserialize, BorshSerialize)]
-enum PropagationState{
+enum PropagationState {
     Forward,
     Backward
 }
