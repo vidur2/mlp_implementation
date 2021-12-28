@@ -1,86 +1,109 @@
-const express = require('express');
-const { connect, keyStores, KeyPair, Contract } = require('near-api-js');
+import got from "got"
+import express from "express";
+import bodyParser from "body-parser"
+import { connect, keyStores, KeyPair, Contract } from 'near-api-js';
 const app = express();
 const port = 8080
 
-const data_store = new Array
+app.use(bodyParser.urlencoded({
+   extended: true,
+}))
 
-
-async function call_contract(csv_string){
-    const keyStore = new keyStores.InMemoryKeyStore();
-    const keyPair = KeyPair.fromString("ed25519:5HcbEsGruC3pyJ4WdqJWVumb3NsoUQDyAfvDPqxLn3njqrgfMtM98zjXAYZ5fNWHz7c8uM6JLRz3VjcPbyrQP3sX")
-    await keyStore.setKey("testnet", "perceptron.testnet", keyPair) 
-    const config = {
-        networkId: "testnet",
-        keyStore,
-        nodeUrl: "https://rpc.testnet.near.org",
-        walletUrl: "https://wallet.testnet.near.org",
-        helperUrl: "https://helper.testnet.near.org",
-        explorerUrl: "https://explorer.testnet.near.org",
-    }
-    const near = await connect(config)
-    const account = await near.account("perceptron.testnet")
-    const contract = new Contract(
-        account,
-        "mlp1.perceptron.testnet",
-        {
-            changeMethods: [
-            "predict",
-            "predict_raw"
-            ],
-            sender: account,
-        }
-    )
-    let args;
-    let splitter;
-    for (let i = 0; i < csv_string.length; i++){
-        splitter = csv_string[i].split(",")
-        args = {
-            input1: parseFloat(splitter[0]),
-            input2: parseFloat(splitter[1]),
-            input3: parseFloat(splitter[2]),
-            input4: parseFloat(splitter[3]),
-            input5: parseFloat(splitter[4]),
-            input6: parseFloat(splitter[5]),
-            input7: parseFloat(splitter[6]),
-            input8: parseFloat(splitter[7]),
-            input9: parseFloat(splitter[8]),
-            input10: parseFloat(splitter[9]),
-            input11: parseFloat(splitter[10]),
-            input12: parseFloat(splitter[11]),
-            input13: parseFloat(splitter[12]),
-            input14: parseFloat(splitter[13]),
-            input15: parseFloat(splitter[14]),
-            input16: parseFloat(splitter[15]),
-            input17: parseFloat(splitter[16]),
-            input18: parseFloat(splitter[23]),
-            input19: parseFloat(splitter[18]),
-            input20: parseFloat(splitter[19]),
-            input21: parseFloat(splitter[20]),
-            input22: parseFloat(splitter[21]),
-            input23: parseFloat(splitter[22]),
-            expected_output: parseFloat(splitter[17]),
-        }
-        await contract.predict({
-            args: args,
-            gas: 115_000_000_000_000
-        })
-    }
+function sleep(time){
+   const stop = new Date().getTime();
+   while (stop < stop + time){
+	;
+   }
 }
 
-app.put("/", (req, res) => {
-    const reqBody = JSON.parse(req.body);
-    data_store.push(reqBody.csv_string.split("\n"));
-    data_store = Array.prototype.concat.apply([], data_store)
-    console.log(data_store)
-    res.send("Success")
+let data_store = new Array
+
+async function call_contract(csv_string, master_account_id, perceptron_key_pair, input_layer_length){
+   const keyStore = new keyStores.InMemoryKeyStore();
+   const keyPair = KeyPair.fromString(perceptron_key_pair)
+   await keyStore.setKey("testnet", `perceptron.${master_account_id}`, keyPair)
+   const config = {
+       networkId: "testnet",
+       keyStore,
+       nodeUrl: "https://rpc.testnet.near.org",
+       walletUrl: "https://wallet.testnet.near.org",
+       helperUrl: "https://helper.testnet.near.org",
+       explorerUrl: "https://explorer.testnet.near.org",
+   }
+   const near = await connect(config)
+   const account = await near.account(`perceptron.${master_account_id}`)
+   const contracts = new Array;
+
+   for (let i = 0; i < input_layer_length; i++) {
+      const contract = new Contract(
+         account,
+         `mlp${i + 1}.perceptron.${master_account_id}`,
+         {
+             changeMethods: [
+             "predict",
+             "predict_raw"
+             ],
+             sender: account,
+         }
+      )
+      contracts.push(contract);
+   }
+   let args;
+   let splitter;
+   for (let i = 0; i < csv_string.length; i++){
+      splitter = csv_string[i].split(",");
+	   console.log(splitter);
+      const expected_output = splitter[j - 1];
+      const inputs = splitter.splice(j - 1, 0);
+      for (let j = 0; j < inputs.length; j++){
+         inputs[j] = parseFloat(inputs[j])
+      }
+      args = {
+         inputs: inputs,
+         expected_output: expected_output
+      }
+	   try{
+         for (let i = 0; i < contracts.length; i++){
+            await contracts[i].predict({
+               args: args,
+               gas: 155000000000000
+            })
+         }
+      } catch{
+         sleep(3000);
+         i -= 1
+      }
+      }
+}
+
+async function full_call(req){
+    got('https://ipfs.io/ipfs/' + req.body.metadata_url).then((value) => {
+        const middle_csv_string = value[Object.keys(value)[Object.keys(value).length-1]]
+        data_store = middle_csv_string.split('\n');
+        const master_account_id = req.body.master_account_id;
+        const perceptron_key_pair = req.body.perceptron_key_pair;
+        const init_layer_amt = req.body.init_layer_amt;
+        data_store.splice(0, 1);
+        console.log(data_store)
+        call_contract(data_store, master_account_id, perceptron_key_pair, init_layer_amt);
+   })
+}
+
+app.put("/", function (req, res) {
+   console.log(req.body.csv_string);
+   data_store.push(req.body.csv_string.split("\n"));
+   data_store = Array.prototype.concat.apply([], data_store)
+   console.log(data_store.length)
+   res.send("Success")
 })
 
 app.post("/", (req, res) => {
-    call_contract(data_store)
-    res.send("Success")
+   data_store = new Array;
+   console.log(req.body.metadata_url);
+   full_call(req);
+   res.send("Success")
 })
 
 app.listen(port, () => {
-    console.log("MLP Middleware is listening on http://localhost:8080")
+   console.log("MLP Middleware is listening on http://localhost:8080")
 })
