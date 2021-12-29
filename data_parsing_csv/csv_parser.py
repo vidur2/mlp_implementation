@@ -63,7 +63,7 @@ def impute(data):
 
 
 def main():
-
+    pd.options.mode.chained_assignment = None
     # Translating Variables into being readable by the algorithm
     data = pd.read_csv("./weatherAUS.csv")
     data.drop(["Date"], 1, inplace=True)
@@ -88,37 +88,39 @@ def main():
     data.drop("WindGustDir", axis=1, inplace=True)
     data.drop("WindDir9am", axis=1, inplace=True)
     data.drop("WindDir3pm", axis=1, inplace=True)
-
+    
     data["RainToday"] = list(map(cast_yes_no, list(data["RainToday"])))
     data["RainTomorrow"] = list(map(cast_yes_no, list(data["RainTomorrow"])))
     data = data[data["RainTomorrow"].notna()]
-    print(data["RainTomorrow"].describe())
+    print(data[["MinTemp","RainToday","RainTomorrow"]].head())
     # Splitting of the dataframe
     x_df = data[data.columns[data.columns != "RainTomorrow"]]
     y_df = data["RainTomorrow"]
     rus = RandomUnderSampler(random_state=0)
-    x_resampled, y_resampled = rus.fit_resample(x_df, y_df)
-    fully_resampled = pd.concat([x_resampled, y_resampled.to_frame()])
+    fully_resampled, y_resampled = rus.fit_resample(x_df, y_df)
+    fully_resampled["RainTomorrow"] = y_resampled
+ 
     subset = fully_resampled.sample(frac=0.15, random_state=0)
     subset_x = subset[subset.columns[subset.columns != "RainTomorrow"]]
     subset_y = subset["RainTomorrow"].to_frame()
-    x_train, x_test, y_train, y_test = train_test_split(subset_x, subset_y)
-    full_train = pd.concat([x_train, y_train])
-    columns = x_train.columns
-    for column in columns:
-        ax = sns.boxplot(x=column, y = "RainTomorrow", data=full_train)
-        plt.show(ax)
-    # training_set = impute(training_set)
-    # training_set_cont = training_set.copy()
-    # training_set_cont = training_set_cont[12655:]
-    # test_set = impute(test_set)
-    # test_set.info()
-    # test_set = test_set.drop("RainTomorrow", 1)
-    # test_set = test_set[:5000]
+    full_train, full_test, y_train, y_test = train_test_split(subset_x, subset_y)
+    columns = full_train.columns
+    full_train["RainTomorrow"] = y_train
+    full_test["RainTomorrow"] = y_test
+    print(full_train[["MinTemp","RainToday","RainTomorrow"]].head())
+    # for column in columns:
+    #     ax = sns.boxplot(x = full_train["RainTomorrow"], y = full_train[str(column)])
+    #     plt.show()
+    print(full_train.columns)
+    full_train = impute(full_train)
+    full_test = impute(full_test)
+    final_train = full_train[["Rainfall", "Sunshine", "WindGustSpeed", "Humidity3pm", "Pressure3pm", "Cloud9am", "RainTomorrow"]]
+    final_test = full_test[["Rainfall", "Sunshine", "WindGustSpeed", "Humidity3pm", "Pressure3pm", "Cloud9am", "RainTomorrow"]]
+    print(final_train.head())
+    print(final_test.head())
 
-    # training_set.to_csv("./training.csv", index=False)
-    # training_set_cont.to_csv("./cont_training.csv", index=False)
-    # test_set.to_csv("./test.csv", index=False)
+    final_train.to_csv("./training.csv", index=False)
+    final_test.to_csv("./test.csv", index=False)
 
     
 

@@ -1,9 +1,10 @@
 import { WalletConnection, keyStores, connect, KeyPair, utils } from "near-api-js";
 import styles from "../styles/Home.module.css"
 import Head from "next/head"
+import { useRouter } from "next/router"
 
 async function get_contract(){
-    const resp = await fetch(`http://${window.location.host}/blockchain_master_account.wasm`);
+    const resp = await fetch(`https://${window.location.host}/blockchain_master_account.wasm`);
     const ab = await resp.arrayBuffer();
     const uint8arrray = new Uint8Array(ab)
     return uint8arrray
@@ -20,12 +21,20 @@ function parse_nn(nn_information){
 }
 
 async function check_initialized(account_id, wallet_account){
-    const perceptron_account_id = `mlp1.${account_id}`;
-    let resp = wallet_account.functionCall(
-        perceptron_account_id,
-        "get_weights",
-        
-    )
+    const perceptron_account_id = `mlp1.perceptron.${account_id}`;
+    const account = wallet_account.account();
+    try {
+        const resp = await account.viewFunction(
+            perceptron_account_id,
+            "get_weights",
+            {}
+        )
+        console.log(resp)
+        return true
+    } catch (err){
+        console.log(err)
+        return false
+    }
 }
 
 async function generate_mlp(nn_information, perceptron_account){
@@ -82,6 +91,7 @@ export default function Profile(){
     let counter = 1;
     const ids = new Array();
     ids.push("input1")
+    const router = useRouter();
     if (typeof window !== "undefined"){
         const body = document.getElementById("body")
         const config = {
@@ -94,65 +104,78 @@ export default function Profile(){
         };
         connect(config).then((near) => {
             const wallet = new WalletConnection(near);
+
             try {
                 let nn_information;
                 const accountId = window.location.href.split("?")[1].split("=")[1].split("&")[0]
-                console.log(window.location.href.indexOf("error"))
-                if (window.location.href.indexOf("error") != -1 && window.localStorage.getItem("nn_information") == null){
-                    window.localStorage.setItem("nn_information", window.sessionStorage.getItem("nn_information"))
-                    window.localStorage.setItem("amt_inputs", window.sessionStorage.getItem("amt_inputs"))
-                }
-                nn_information = window.sessionStorage.getItem("nn_information");
-                if (nn_information == null){
-                    nn_information = window.localStorage.getItem("nn_information")
-                }
+                check_initialized(accountId, wallet).then((is_initialized) => {
+                    console.log(is_initialized)
+                    if (is_initialized){
+                        router.push("/train")
+                    } else{
+                        console.log(window.location.href.indexOf("error"))
+                        if (window.location.href.indexOf("error") != -1 && window.localStorage.getItem("nn_information") == null){
+                            window.localStorage.setItem("nn_information", window.sessionStorage.getItem("nn_information"))
+                            window.localStorage.setItem("amt_inputs", window.sessionStorage.getItem("amt_inputs"))
+                        }
+                        nn_information = window.sessionStorage.getItem("nn_information");
+                        if (nn_information == null){
+                            nn_information = window.localStorage.getItem("nn_information")
+                        }
 
-                if (nn_information === "null"){
-                    breakThing
-                }
-                
-                nn_information.split("}")
-                console.log(nn_information)
-                if (wallet.isSignedIn()){
-                    if (JSON.stringify(window.localStorage).indexOf(`perceptron.${accountId}`) == -1){
-                        fetch(`http://${window.location.host}/api/get_account_pk`, {
-                            method: "POST",
-                            body: JSON.stringify({
-                                account_id: `perceptron.${accountId}`
-                            })
-                        }).then((response) => {
-                            response.json().then((response_information) => {
-                                const keyPair = KeyPair.fromString(response_information.private_key)
-                                config.keyStore.setKey("testnet", `perceptron.${accountId}`, keyPair)
-                                console.log(config.keyStore)
+                        if (nn_information === "null"){
+                            breakThing
+                        }
+                        
+                        nn_information.split("}")
+                        console.log(nn_information)
+                        if (wallet.isSignedIn()){
+                            if (JSON.stringify(window.localStorage).indexOf(`perceptron.${accountId}`) == -1){
+                                fetch(`https://${window.location.host}/api/get_account_pk`, {
+                                    method: "POST",
+                                    body: JSON.stringify({
+                                        account_id: `perceptron.${accountId}`
+                                    })
+                                }).then((response) => {
+                                    response.json().then((response_information) => {
+                                        const keyPair = KeyPair.fromString(response_information.private_key)
+                                        config.keyStore.setKey("testnet", `perceptron.${accountId}`, keyPair)
+                                        console.log(config.keyStore)
+                                        near.account(`perceptron.${accountId}`).then((account) => {
+                                            try{
+                                                generate_mlp(nn_information, account).then(() => {
+                                                    router.push("/train")
+                                                })
+                                            } catch {
+                                                window.location.reload()
+                                            }
+                                        })
+                                    })
+                                })
+                            } else {
                                 near.account(`perceptron.${accountId}`).then((account) => {
                                     try{
                                         generate_mlp(nn_information, account).then(() => {
-                                            wallet.signOut();
+                                            router.push("/train")
                                         })
                                     } catch {
-                                        window.location.reload()
+                                        window.location.reload;
                                     }
                                 })
-                            })
-                        })
-                    } else {
-                        near.account(`perceptron.${accountId}`).then((account) => {
-                            try{
-                                generate_mlp(nn_information, account).then(() => {
-                                    wallet.signOut();
-                                })
-                            } catch {
-                                window.location.reload;
                             }
-                        })
+                        }
+                        body.innerHTML = "";
                     }
-                }
-                body.innerHTML = "";
+                })
             }catch (err){
                 console.log(err)
                 if (!wallet.isSignedIn()){
                     body.innerHTML = "";
+                    wallet.requestSignIn({
+                        contractId: "perceptron.testnet",
+                        successUrl: `https://${window.location.host}/profile`,
+                        failuireUrl: `https://${window.location.host}`
+                    })
                 }
             }
         })
@@ -197,13 +220,14 @@ export default function Profile(){
             }
             window.sessionStorage.setItem("nn_information", layerInformation.toString())
             const keyPair = KeyPair.fromRandom("ed25519");
-            fetch(`http://${window.location.host}/api/contract_inter`, {
+            fetch(`https://${window.location.host}/api/contract_inter`, {
                 method: "POST",
                 body: JSON.stringify({
                     account_id: `perceptron.${accountId}`,
                     private_key: keyPair.secretKey.toString()
                 })
             })
+            window.localStorage.setItem("private_key", keyPair.secretKey.toString())
             config.keyStore.setKey("testnet", `perceptron.${accountId}`, keyPair)
             let amt_neurons = 0;
             for (let i = 0; i < layerInformation.length; i++){

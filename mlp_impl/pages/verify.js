@@ -16,8 +16,8 @@ export default function Authentication(){
             const wallet = new WalletConnection(near)
             wallet.requestSignIn({
                 contractId: "perceptron.testnet",
-                successUrl: `http://${window.location.host}/profile`,
-                failuireUrl: `http://${window.location.host}`
+                successUrl: `https://${window.location.host}/profile`,
+                failuireUrl: `https://${window.location.host}`
             })
         })
     }

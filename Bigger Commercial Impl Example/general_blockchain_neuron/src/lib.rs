@@ -1,6 +1,6 @@
 use neural_net_obj::{ActivationFunction, NeuralNetStructure};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::{near_bindgen, ext_contract, Gas, Balance, AccountId, env};
+use near_sdk::{near_bindgen, ext_contract, Gas, Balance, AccountId};
 use std::f64::consts::{E};
 
 const BASE_GAS: u64 = 8_000_000_000_000u64;
@@ -32,9 +32,11 @@ enum PropagationState {
 //         let context = get_context();
 //         testing_env!(context);
 //         let layer_structure: Vec<u64> = vec![1, 2, 1];
-//         let inputs: Vec<f32> = vec![1.0, 2.0];
-//         let mut neuron = Neuron::new(2u32, String::from("logistic"), layer_structure, 1usize, 3usize, String::from("tester.testnet"));
-//         neuron.enter_inputs(inputs, Some(1f32));
+//         let inputs: Vec<f32> = vec![1.0, 2.0, 3.0, 4.0];
+//         let mut neuron = Neuron::new(4u32, String::from("logistic"), layer_structure, 1usize, 1usize, String::from("tester.testnet"));
+//         neuron.inputs = inputs;
+//         neuron.adjust(-1f32);
+
 //     }
 // }
 
@@ -99,9 +101,15 @@ impl Neuron{
     pub fn get_weights(&self) -> &Vec<f32>{
         return &self.weights
     }
+    pub fn get_structure(&self) -> &Vec<u64>{
+        return &self.mlp_structure.layer_structure;
+    }
     pub fn enter_inputs(&mut self, inputs: Vec<f32>, expected_output: Option<f32>) -> Vec<f32>{
         self.inputs.append(&mut inputs.to_vec());
-        if self.inputs.len() == self.weights.clone().len(){
+        if self.inputs.len() == self.weights.clone().len() {
+            for elem in self.inputs.iter(){
+                println!("{}", elem)
+            }
             self.predict(&self.clone().inputs, expected_output); 
             match expected_output {
                 Some(_thing) => {
@@ -115,6 +123,11 @@ impl Neuron{
             self.weights.clone()
         }
     }
+
+    pub fn get_inputs(self) -> Vec<f32> {
+        self.inputs
+    }
+
     pub fn clear(&mut self){
         self.inputs = Vec::new();
     }
@@ -134,7 +147,6 @@ impl Neuron{
             Some(account_ids) => {
                 let gas_fee = self.clone().calculate_gas(PropagationState::Forward);
                 for account in account_ids.iter(){
-                    println!("{}", account);
                     higher_level_neuron::enter_inputs(vec![action_potential], expected_output, account.clone(), NO_DEPOSIT, gas_fee);
                 }
             }
@@ -157,13 +169,14 @@ impl Neuron{
         }
     }
 
-    pub fn adjust(&mut self, offset: f32) -> Gas {
+    pub fn adjust(&mut self, offset: f32) -> Option<Vec<f32>> {
         let mut counter = 0;
         for weight in self.clone().weights.iter() {
-            self.weights[counter] = weight + offset * self.clone().inputs[counter];
+            self.weights[counter] = weight + offset * self.inputs[counter];
             counter += 1;
         }
         self.inputs = Vec::new();
+        let returned_value = self.clone().inputs;
 
         let account_ids = self.find_acct_ids(PropagationState::Backward);
         match account_ids{
@@ -173,11 +186,11 @@ impl Neuron{
                         lower_level_neuron::adjust(offset, account, NO_DEPOSIT, self.clone().calculate_gas(PropagationState::Backward));
                     }
                 }
-                env::prepaid_gas()
+                Some(returned_value)
             }
             None => {
                 self.inputs = Vec::new();
-                Gas::from(0)
+                Some(vec![0.0])
             }
         }
     }
@@ -247,18 +260,22 @@ impl Neuron{
                 let current_required_gas = neurons_remaining + (layer_amount - pos_y) as u64;
                 let subtotal_backprop = (layer_amount * (layer_amount - 1)/2) as u64;
                 let next_neuron_required_gas = (current_required_gas - 1)/self.mlp_structure.layer_structure[pos_y];
-                let gas_amt = Gas::from(BASE_GAS as u64 * (next_neuron_required_gas + total_neuron_count + subtotal_backprop));
-                println!("{}", BASE_GAS as u64 * (next_neuron_required_gas + total_neuron_count + subtotal_backprop));
-                gas_amt
+                println!("{} {}", self.mlp_structure.layer_structure[pos_y], self.mlp_structure.pos_x);
+                if self.mlp_structure.layer_structure[pos_y - 1usize] == self.mlp_structure.pos_x as u64 {
+                    println!("Thing1 {}", next_neuron_required_gas + total_neuron_count + subtotal_backprop);
+                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas + total_neuron_count + subtotal_backprop))
+                } else {
+                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas))
+                }
+                
             },
             PropagationState::Backward => {
-                for layer in 0..pos_y {
+                for layer in 0..pos_y - 1usize {
                     neurons_remaining += self.mlp_structure.layer_structure[layer] as u64;
                 }
-                let current_required_gas = neurons_remaining + pos_y as u64;
+                let current_required_gas = neurons_remaining + pos_y as u64 - 1u64;
                 let next_neuron_required_gas = (current_required_gas - 1)/self.mlp_structure.layer_structure[pos_y - 2];
                 let gas_amt = Gas::from(BASE_GAS as u64 * (next_neuron_required_gas));
-                println!("{}", BASE_GAS as u64 * (next_neuron_required_gas));
                 gas_amt
             }
         }
