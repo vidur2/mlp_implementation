@@ -1,9 +1,9 @@
 use neural_net_obj::{ActivationFunction, NeuralNetStructure};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::{near_bindgen, ext_contract, Gas, Balance, AccountId};
+use near_sdk::{near_bindgen, ext_contract, Gas, Balance, AccountId, env};
 use std::f64::consts::{E};
 
-const BASE_GAS: u64 = 8_000_000_000_000u64;
+const BASE_GAS: u64 = 11_000_000_000_000u64;
 const NO_DEPOSIT: Balance = 0;
 
 #[repr(u8)]
@@ -31,11 +31,10 @@ enum PropagationState {
 //     fn test_for_loop() {
 //         let context = get_context();
 //         testing_env!(context);
-//         let layer_structure: Vec<u64> = vec![1, 2, 1];
+//         let layer_structure: Vec<u64> = vec![1, 2, 2, 1];
 //         let inputs: Vec<f32> = vec![1.0, 2.0, 3.0, 4.0];
 //         let mut neuron = Neuron::new(4u32, String::from("logistic"), layer_structure, 1usize, 1usize, String::from("tester.testnet"));
-//         neuron.inputs = inputs;
-//         neuron.adjust(-1f32);
+//         neuron.calculate_gas(PropagationState::Forward, String::from("mlp3.perceptron.tester.testnet"));
 
 //     }
 // }
@@ -104,12 +103,9 @@ impl Neuron{
     pub fn get_structure(&self) -> &Vec<u64>{
         return &self.mlp_structure.layer_structure;
     }
-    pub fn enter_inputs(&mut self, inputs: Vec<f32>, expected_output: Option<f32>) -> Vec<f32>{
+    pub fn enter_inputs(&mut self, inputs: Vec<f32>, expected_output: Option<f32>) -> Gas{
         self.inputs.append(&mut inputs.to_vec());
         if self.inputs.len() == self.weights.clone().len() {
-            for elem in self.inputs.iter(){
-                println!("{}", elem)
-            }
             self.predict(&self.clone().inputs, expected_output); 
             match expected_output {
                 Some(_thing) => {
@@ -118,9 +114,9 @@ impl Neuron{
                     self.inputs = Vec::new()
                 }
             };
-            self.weights.clone()
+            env::prepaid_gas()
         } else {
-            self.weights.clone()
+            env::prepaid_gas()
         }
     }
 
@@ -132,7 +128,7 @@ impl Neuron{
         self.inputs = Vec::new();
     }
 
-    pub fn predict(&mut self, inputs: &Vec<f32>, expected_output: Option<f32>){
+    pub fn predict(&mut self, inputs: &Vec<f32>, expected_output: Option<f32>) -> Gas{
         let mut weighted_sum: f32 = self.bias;
         if inputs.len() == self.weights.len(){
             let mut i = 0;
@@ -145,8 +141,8 @@ impl Neuron{
         let action_potential = self.activate(weighted_sum);
         match account_ids {
             Some(account_ids) => {
-                let gas_fee = self.clone().calculate_gas(PropagationState::Forward);
                 for account in account_ids.iter(){
+                    let gas_fee = self.clone().calculate_gas(PropagationState::Forward, account.clone().to_string());
                     higher_level_neuron::enter_inputs(vec![action_potential], expected_output, account.clone(), NO_DEPOSIT, gas_fee);
                 }
             }
@@ -167,6 +163,7 @@ impl Neuron{
                 }
             }
         }
+        env::prepaid_gas()
     }
 
     pub fn adjust(&mut self, offset: f32) -> Option<Vec<f32>> {
@@ -183,7 +180,7 @@ impl Neuron{
             Some(account_ids) => {
                 if self.mlp_structure.pos_x as u64 == self.mlp_structure.layer_structure[self.mlp_structure.pos_y - 1usize]{
                     for account in account_ids {
-                        lower_level_neuron::adjust(offset, account, NO_DEPOSIT, self.clone().calculate_gas(PropagationState::Backward));
+                        lower_level_neuron::adjust(offset, account.clone(), NO_DEPOSIT, self.clone().calculate_gas(PropagationState::Backward, account.clone().to_string()));
                     }
                 }
                 Some(returned_value)
@@ -247,7 +244,7 @@ impl Neuron{
             }
         }
     }
-    fn calculate_gas(self, state: PropagationState) -> Gas{
+    fn calculate_gas(self, state: PropagationState, next_account_id: String) -> Gas{
         let pos_y = self.mlp_structure.pos_y;
         let total_neuron_count: u64 = self.mlp_structure.layer_structure.iter().sum();
         let mut neurons_remaining = 0u64;
@@ -260,12 +257,17 @@ impl Neuron{
                 let current_required_gas = neurons_remaining + (layer_amount - pos_y) as u64;
                 let subtotal_backprop = (layer_amount * (layer_amount - 1)/2) as u64;
                 let next_neuron_required_gas = (current_required_gas - 1)/self.mlp_structure.layer_structure[pos_y];
-                println!("{} {}", self.mlp_structure.layer_structure[pos_y], self.mlp_structure.pos_x);
-                if self.mlp_structure.layer_structure[pos_y - 1usize] == self.mlp_structure.pos_x as u64 {
-                    println!("Thing1 {}", next_neuron_required_gas + total_neuron_count + subtotal_backprop);
-                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas + total_neuron_count + subtotal_backprop))
+                let mut next_account_num = next_account_id.clone();
+                next_account_num.replace_range(0..3, "");
+                next_account_num.replace_range(1.., "");
+                let final_account_num: i64 = next_account_num.trim().parse().expect("not a valid number");
+                println!("{}", neurons_remaining);
+                if self.mlp_structure.layer_structure[pos_y - 1usize] == self.mlp_structure.pos_x as u64 && final_account_num - (total_neuron_count - neurons_remaining) as i64 == self.mlp_structure.layer_structure[pos_y] as i64 {
+                    println!("Gas {}", BASE_GAS as u64 * (next_neuron_required_gas + total_neuron_count + subtotal_backprop + ((layer_amount - pos_y) * (self.mlp_structure.layer_structure.len() - 2)) as u64));
+                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas + total_neuron_count + subtotal_backprop + ((layer_amount - pos_y) * (self.mlp_structure.layer_structure.len() - 2)) as u64))
                 } else {
-                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas))
+                    println!("Gas {}", BASE_GAS as u64 * (next_neuron_required_gas + (layer_amount - pos_y) as u64));
+                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas + (layer_amount - pos_y) as u64))
                 }
                 
             },
@@ -275,10 +277,21 @@ impl Neuron{
                 }
                 let current_required_gas = neurons_remaining + pos_y as u64 - 1u64;
                 let next_neuron_required_gas = (current_required_gas - 1)/self.mlp_structure.layer_structure[pos_y - 2];
-                let gas_amt = Gas::from(BASE_GAS as u64 * (next_neuron_required_gas));
-                gas_amt
+                let mut next_account_num = next_account_id.clone();
+                next_account_num.replace_range(0..3, "");
+                next_account_num.replace_range(1.., "");
+                let final_account_num: i64 = next_account_num.trim().parse().expect("not a valid number");
+                println!("{} {}", final_account_num, neurons_remaining);
+                if final_account_num - neurons_remaining as i64 == 0 {
+                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas + pos_y as u64))
+                } else {
+                    Gas::from(BASE_GAS as u64 * (next_neuron_required_gas))
+                }
             }
         }
+    }
+    pub fn get_output(&self) -> Option<u8> {
+        self.output
     }
     fn activate(&self, sum: f32) -> f32{
         match self.activation_function {

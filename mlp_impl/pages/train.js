@@ -93,6 +93,34 @@ export default function Train(){
         })
     }
 
+    const scoreModel = async(event) =>{
+        const config = {
+            networkId: "testnet",
+            keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+            nodeUrl: "https://rpc.testnet.near.org",
+            walletUrl: "https://wallet.testnet.near.org",
+            helperUrl: "https://helper.testnet.near.org",
+            explorerUrl: "https://explorer.testnet.near.org",
+        };
+        connect(config).then((near) => {
+            const wallet = new WalletConnection(near)
+            const account = wallet.account();
+            event.preventDefault();
+            const file = event.target.file_input.files[0];
+            const formBody = new URLSearchParams;
+            getMetadataStore(file).then((value) => {
+                console.log('https://ipfs.io/ipfs/' + value.value.cid)
+                formBody.append("metadata_url", value.value.cid)
+                formBody.append("contract_id", account.accountId);
+                formBody.append("init_layer_amt", parseInt(window.sessionStorage.getItem("num_neurons")))
+                fetch ("https://mlp-api.app.vtxhub.com/score", {
+                    method: "POST",
+                    body: formBody
+                })
+            })
+        })
+    }
+
     return(
         <div className={styles.container} id = "trainPage">
             <Head>
@@ -103,6 +131,10 @@ export default function Train(){
                 <form onSubmit={parse_csv}>
                     <input type="file" name="file_input"></input>
                     <button type="submit">Submit</button>
+                </form>
+                <form onSubmit={scoreModel}>
+                    <input type="file" name="score_csv"></input>
+                    <button type="submit"></button>
                 </form>
             </main>
         </div>

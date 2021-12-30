@@ -1,6 +1,7 @@
 import got from "got"
 import express from "express";
-import bodyParser from "body-parser"
+import bodyParser from "body-parser";
+import ObjectsToCsv from "objects-to-csv"
 import { connect, keyStores, KeyPair, Contract } from 'near-api-js';
 const app = express();
 const port = 8080
@@ -89,6 +90,72 @@ async function full_call(req){
    })
 }
 
+async function score_contract(data, contract_id, init_layer_amt){
+      const keyStore = new keyStores.InMemoryKeyStore();
+      const keyPair = KeyPair.fromString("job topic jump eight unaware cabbage average vague artefact again history success")
+      await keyStore.setKey("testnet", "perceptron.testnet", keyPair)
+      const config = {
+         networkId: "testnet",
+         keyStore,
+         nodeUrl: "https://rpc.testnet.near.org",
+         walletUrl: "https://wallet.testnet.near.org",
+         helperUrl: "https://helper.testnet.near.org",
+         explorerUrl: "https://explorer.testnet.near.org",
+      }
+      const near = await connect(config)
+      const account = await near.account("perceptron.testnet")
+      const contracts = new Array
+
+      for (let j = 0; j < init_layer_amt; j++){
+         const contract = new Contract (
+            account,
+            `mlp${j + 1}.perceptron.${contract_id}`,
+            {
+               changeMethods: [
+                  "enter_inputs"
+               ],
+               viewMethods: [
+                  "get_output"
+               ]
+            }
+         )
+         contracts.push(contract)
+      }
+
+      const rows = data.split("\n");
+      let actual_values = new Array;
+      let predicted_values = new Array
+      for (let i = 0; i < rows.length; i++){
+         const split_data = rows[i].split(",");
+         split_data.pop()
+         const actual_value = split_data[split_data.length - 1]
+         const args = {
+            inputs: split_data,
+            expected_output: null
+         }
+
+         for (let j = 0; j < contracts.length; j++){
+            const contract = contracts[j]
+            await contract.enter_inputs({
+               args: args,
+               gas: 300000000000000
+            })
+         }
+         const predicted_value = await contracts[0].get_output({
+            args: {},
+            gas: 10000000000000
+         })
+
+         predicted_values.push(predicted_value)
+         actual_values.push(actual_value)
+      }
+      const combined_arrays = [actual_values, predicted_values];
+      const csv = new ObjectsToCsv(combined_arrays)
+      await csv.toDisk("./tests.csv")
+
+      
+}
+
 app.put("/", function (req, res) {
    console.log(req.body.csv_string);
    data_store.push(req.body.csv_string.split("\n"));
@@ -104,6 +171,12 @@ app.post("/", (req, res) => {
    res.send("Success")
 })
 
+app.post("/score", (req, res) => {
+   got('https://ipfs.io/ipfs/' + req.body.metadata_url).then((value) => {
+      score_contract(value, req.body.contract_id, req.body.init_layer_amt)
+   })
+})
+
 app.listen(port, () => {
-   console.log("MLP Middleware is listening on http://localhost:8080")
+   console.log(`MLP Middleware is listening on http://localhost:${port}`)
 })

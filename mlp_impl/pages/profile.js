@@ -41,50 +41,48 @@ async function generate_mlp(nn_information, perceptron_account){
     const wasm = await get_contract()
     const contract_id = perceptron_account.accountId
     console.log(perceptron_account)
-    perceptron_account.deployContract(wasm).then(() => {
-        nn_information = nn_information.split("},")
-        nn_information = parse_nn(nn_information)
-        const amt_neurons = parseInt(window.sessionStorage.getItem("amt_neurons"))
-        perceptron_account.functionCall(
+    await perceptron_account.deployContract(wasm)
+    nn_information = nn_information.split("},")
+    nn_information = parse_nn(nn_information)
+    const amt_neurons = parseInt(window.sessionStorage.getItem("amt_neurons"))
+    await perceptron_account.functionCall(
             contract_id,
             "generate_mlp",
             {
                 amt_neurons: amt_neurons
             },
-            "100000000000000"
-        ).then(() => {
-                let layer_amt = new Array;
-                let activation_function = new Array;
-                let current_iter;
-                let prev_iter;
-                for (let i = 0; i < nn_information.length; i++){
-                    current_iter = nn_information[i].pos_y
-                    if (i > 0){
-                        prev_iter = nn_information[i - 1].pos_y
-                    }
-                    if (current_iter != prev_iter){
-                        activation_function.push(nn_information[i].act_func);
-                        layer_amt.push(nn_information[i].amt_in_layer);
-                    }
-                }
-                let amt_inputs;
-                if (window.sessionStorage.getItem("amt_inputs") != null){
-                    amt_inputs = parseInt(window.sessionStorage.getItem("amt_inputs"))
-                }else {
-                    amt_inputs = parseInt(window.localStorage.getItem("amt_inputs"))
-                }
-                perceptron_account.functionCall(
-                    contract_id,
-                    "initialize_mlp",
-                    {
-                        input_amt: amt_inputs,
-                        layer_amt: layer_amt,
-                        activation_function: activation_function,
-                    },
-                    "100000000000000"
-                )
-            })
-        })
+            "300000000000000"
+        )
+    let layer_amt = new Array;
+    let activation_function = new Array;
+    let current_iter;
+    let prev_iter;
+    for (let i = 0; i < nn_information.length; i++){
+        current_iter = nn_information[i].pos_y
+        if (i > 0){
+            prev_iter = nn_information[i - 1].pos_y
+        }
+        if (current_iter != prev_iter){
+            activation_function.push(nn_information[i].act_func);
+            layer_amt.push(nn_information[i].amt_in_layer);
+        }
+    }
+    let amt_inputs;
+    if (window.sessionStorage.getItem("amt_inputs") != null){
+        amt_inputs = parseInt(window.sessionStorage.getItem("amt_inputs"))
+    }else {
+        amt_inputs = parseInt(window.localStorage.getItem("amt_inputs"))
+    }
+    await perceptron_account.functionCall(
+        contract_id,
+        "initialize_mlp",
+        {
+            input_amt: amt_inputs,
+            layer_amt: layer_amt,
+            activation_function: activation_function,
+        },
+        "100000000000000"
+    )
 }
 
 export default function Profile(){
@@ -164,7 +162,7 @@ export default function Profile(){
                                 })
                             }
                         }
-                        body.innerHTML = "";
+                        body.innerHTML = "Loading...";
                     }
                 })
             }catch (err){
@@ -253,6 +251,7 @@ export default function Profile(){
     const addInput = async(event) => {
         event.preventDefault();
         const removeButton = document.getElementById("removal_button")
+        const addButton = document.getElementById("add_button")
         if (removeButton.disabled){
             removeButton.disabled = false;
         }
@@ -260,6 +259,9 @@ export default function Profile(){
         ids.push(`input${counter}`)
         const form_element = document.getElementById("form_ext");
         form_element.innerHTML = form_element.innerHTML + `<p></p><span id=layer${counter}>Layer ${counter} Information: <input id=input${counter} type="text" placeholder="Amt of Neurons"></input><select id="act_func_${counter}"><option>Act Func</option><option>tanh</option><option>logistic</option><option>step</option><option>linear</option></select></span>`;
+        if (counter == 3){
+            addButton.disabled = true;
+        }
 
     }
 
@@ -268,11 +270,15 @@ export default function Profile(){
         ids.pop();
         console.log(ids)
         const removeButton = document.getElementById("removal_button")
+        const addButton = document.getElementById("add_button")
         const form_element = document.getElementById(`layer${counter}`);
         console.log(form_element)
         if (counter != 1){
             form_element.outerHTML = "";
-            counter -= 1;
+            if (counter == 3){
+                addButton.disabled = false;
+            }
+            counter -= 1
         } else {
             removeButton.disabled = true;
         }
@@ -300,7 +306,7 @@ export default function Profile(){
                         </select>
                         <div id="form_ext"></div>
                         <p style={{paddingBottom: "0.1%"}}></p>
-                        <button onClick={addInput}>Add Layer</button><button onClick={removeInput} id="removal_button">Remove Layer</button>
+                        <button onClick={addInput} id = "add_button">Add Layer</button><button onClick={removeInput} id="removal_button">Remove Layer</button>
                         <p></p>
                         <button onSubmit={handleTransaction}>Submit</button>
                     </form>
