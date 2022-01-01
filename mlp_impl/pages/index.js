@@ -17,13 +17,13 @@ export default function Home() {
         </h1>
 
         <p className="description">
-          Read about the project <a href="/about" id="linkText">here</a>
+          Deploy your own <a href="/verify" id="linkText">here</a>
         </p>
 
         <div className="grid">
           <a href="/predict" className="card">
             <h3>Predict &rarr;</h3>
-            <p>Run a prediction and get output to see the model in action</p>
+            <p>Run a prediction and get output to see a sample model in action</p>
           </a>
 
           <a className="card" style ={{border: "dashed", borderColor: "lightgray", borderWidth: "0.5px", color: "gray"}}>

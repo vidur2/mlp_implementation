@@ -2,6 +2,7 @@ import styles from "../styles/Home.module.css"
 import Head from "next/head"
 import { WalletConnection, connect, keyStores } from "near-api-js"
 import { useRouter } from "next/router"
+import nearSeedPhrase from "near-seed-phrase";
 
 async function getMetadataStore(file){
     const res = await fetch('https://api.nft.storage/upload',{
@@ -64,7 +65,7 @@ export default function Train(){
     
         })
     }
-    const parse_csv = async(event) =>{
+    const parse_csv = async(event) => {
         const config = {
             networkId: "testnet",
             keyStore: new keyStores.BrowserLocalStorageKeyStore(),
@@ -73,23 +74,34 @@ export default function Train(){
             helperUrl: "https://helper.testnet.near.org",
             explorerUrl: "https://explorer.testnet.near.org",
         };
-        connect(config).then((near) => {
-            const wallet = new WalletConnection(near)
-            const account = wallet.account();
-            event.preventDefault();
-            const file = event.target.file_input.files[0];
-            const formBody = new URLSearchParams;
-            getMetadataStore(file).then((value) => {
-                console.log('https://ipfs.io/ipfs/' + value.value.cid)
-                formBody.append("metadata_url", value.value.cid)
-                formBody.append("master_account_id", account.accountId);
-                formBody.append("init_layer_amt", parseInt(window.sessionStorage.getItem("num_neurons")))
-                formBody.append("perceptron_key_pair", window.localStorage.getItem("private_key"))
-                fetch ("https://mlp-api.app.vtxhub.com/", {
-                    method: "POST",
-                    body: formBody
+        const near = await connect(config)
+        const wallet = new WalletConnection(near)
+        const account = wallet.account();
+        if (window.localStorage.getItem("private_key") == null){
+            const resp = await fetch(`https://${window.location.host}/api/get_account_pk`, {
+                method: "POST",
+                body: JSON.stringify({
+                    account_id: account.accountId
                 })
             })
+            const json = resp.json();
+            window.localStorage.setItem("private_key", json.private_key)
+        }
+        event.preventDefault();
+        const file = event.target.file_input.files[0];
+        const formBody = new URLSearchParams;
+        getMetadataStore(file).then((value) => {
+            console.log('https://ipfs.io/ipfs/' + value.value.cid)
+            formBody.append("metadata_url", value.value.cid)
+            formBody.append("master_account_id", account.accountId);
+            formBody.append("init_layer_amt", parseInt(window.sessionStorage.getItem("num_neurons")))
+            formBody.append("perceptron_key_pair", window.localStorage.getItem("private_key"))
+            fetch ("https://mlp-api.app.vtxhub.com/", {
+                method: "POST",
+                body: formBody
+            })
+            const body = document.getElementById("body");
+            body.innerHTML = `<a href=https://explorer.testnet.near.org/accounts/perceptron.${account.accountId}>Click Here to view the progress of your training</a>`
         })
     }
 
@@ -106,17 +118,23 @@ export default function Train(){
             const wallet = new WalletConnection(near)
             const account = wallet.account();
             event.preventDefault();
-            const file = event.target.file_input.files[0];
+            const file = event.target.score_csv.files[0];
             const formBody = new URLSearchParams;
+            const pk = nearSeedPhrase.parseSeedPhrase("job topic jump eight unaware cabbage average vague artefact again history success")
+            const final_pk = pk.secretKey.split(":");
+            console.log(final_pk[1])
             getMetadataStore(file).then((value) => {
                 console.log('https://ipfs.io/ipfs/' + value.value.cid)
                 formBody.append("metadata_url", value.value.cid)
                 formBody.append("contract_id", account.accountId);
                 formBody.append("init_layer_amt", parseInt(window.sessionStorage.getItem("num_neurons")))
+                formBody.append("private_key", final_pk)
                 fetch ("https://mlp-api.app.vtxhub.com/score", {
                     method: "POST",
                     body: formBody
                 })
+                const body = document.getElementById("body");
+                body.innerHTML = `<a href=https://explorer.testnet.near.org/accounts/mlp1.perceptron.${account.accountId}>Click Here to view the progress of your testing</a>`
             })
         })
     }
@@ -127,14 +145,14 @@ export default function Train(){
                 <title>Training Page</title>
                 <link rel="icon" href="/logo.svg" />
             </Head>
-            <main className = {styles.main}>
+            <main className = {styles.main} id = "body">
                 <form onSubmit={parse_csv}>
                     <input type="file" name="file_input"></input>
-                    <button type="submit">Submit</button>
+                    <button type="submit">Submit Train CSV</button>
                 </form>
                 <form onSubmit={scoreModel}>
                     <input type="file" name="score_csv"></input>
-                    <button type="submit"></button>
+                    <button type="submit">Submit Test CSV</button>
                 </form>
             </main>
         </div>
