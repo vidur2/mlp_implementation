@@ -35,7 +35,7 @@ const MessageType = {
 
 const genesis_time = Date.now()/1000;
 
-function get_genesis_block(genesis_time) {
+function get_genesis_block() {
     return new Block(0, "0", genesis_time, "created by vidur2", "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7")
 }
 
@@ -70,6 +70,10 @@ function initHttpServer(){
 
         res.send({"Status": "Initialized Accounts"})
     })
+    app.post("/init_contract", (req, res) => {
+        const smart_contract = req.body.smart_contract;
+        const name = req.body.account_name
+    })
 }
 
 function getLatestBlock(){
@@ -79,7 +83,7 @@ function getLatestBlock(){
 function generateNextBlock(data){
     const timestamp = Date.now()/1000
     const nextHash = CryptoJs.SHA256(blockchain.length + getLatestBlock().hash + timestamp + data).toString()
-    return new Block(blockchain.length, getLatestBlock().hash, timestamp, data, hash)
+    return new Block(blockchain.length, getLatestBlock().hash, timestamp, data, nextHash)
 }
 
 function addBlock(block){
