@@ -1,0 +1,29 @@
+{
+  "name": "neural_net_blockchain",
+  "version": "1.0.0",
+  "description": "blockchain specifically built for hosting a neural network",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vidur2/mlp_implementation.git"
+  },
+  "keywords": [
+    "blockchain",
+    "neural_network"
+  ],
+  "author": "vidur2",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vidur2/mlp_implementation/issues"
+  },
+  "homepage": "https://github.com/vidur2/mlp_implementation#readme",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "crypto-js": "^4.1.1",
+    "express": "^4.17.2",
+    "ws": "^8.4.0"
+  }
+}
